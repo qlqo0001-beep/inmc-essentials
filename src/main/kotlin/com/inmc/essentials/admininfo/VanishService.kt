@@ -2,6 +2,7 @@ package com.inmc.essentials.admininfo
 
 import com.inmc.essentials.Ess
 import com.inmc.essentials.util.Ph
+import kr.inmc.core.event.FakeConnectionEvent
 import kr.inmc.core.integration.TitleForgeNames
 import kr.inmc.core.integration.Vanish
 import net.kyori.adventure.bossbar.BossBar
@@ -128,20 +129,21 @@ internal class VanishService(private val ess: Ess, private val feature: AdminInf
             return
         }
         if (on) {
+            // 가짜 퇴장은 표식을 걸기 **전에** — 타이틀포지·디스코드가 아직 보이는 사람으로 보고 진짜 퇴장처럼 만든다(core FakeConnectionEvent).
+            if (announce && option(id, VanishOption.FAKE_JOIN_LEAVE)) fake(player, joining = false)
             active[id] = System.currentTimeMillis()
             vanishedAt.remove(id)
             mask(id, atJoin)
             Vanish.set(ess.plugin, player, true)
-            if (announce && option(id, VanishOption.FAKE_JOIN_LEAVE)) fake(player, "admininfo-vanish-fake-quit")
             hideFromOthers(player)
             applyEffects(player)
             if (announce) staffNotice(player, "admininfo-vanish-staff-on")
         } else {
-            // 못 보던 사람에게 "들어왔다" — 보이게 하기 전에 고른다.
-            if (announce && option(id, VanishOption.FAKE_JOIN_LEAVE)) fake(player, "admininfo-vanish-fake-join")
             active.remove(id)
             unmask(id)
             Vanish.set(ess.plugin, player, false)
+            // 가짜 접속은 표식을 푼 **뒤에** — 받는 사람은 권한으로 고르므로(못 보던 사람 = 볼 권한 없는 사람) 순서와 상관없다.
+            if (announce && option(id, VanishOption.FAKE_JOIN_LEAVE)) fake(player, joining = true)
             for (other in Bukkit.getOnlinePlayers()) if (other != player) other.showPlayer(ess.plugin, player)
             clearEffects(player)
             if (announce) staffNotice(player, "admininfo-vanish-staff-off")
@@ -190,12 +192,21 @@ internal class VanishService(private val ess: Ess, private val feature: AdminInf
         }
     }
 
-    /** 투명을 켠 쪽/끈 쪽 — 볼 권한이 없는 접속자(지금 못 보는 사람)에게만. */
-    private fun fake(player: Player, key: String) {
-        // 접두 없이 — 진짜 접속·퇴장 메시지처럼 보여야 한다.
-        val message = ess.messages.component(key, Ph.of().player(displayName(player)))
+    /**
+     * 가짜 접속([joining])·퇴장 — core [FakeConnectionEvent] 를 쏴서 문구를 정하고(타이틀포지가 진짜와 같은 모양으로 · 디스코드가 채널에),
+     * 볼 권한이 없는 접속자(지금 못 보는 사람)와 **본인**에게 보낸다(본인도 무엇이 나갔는지 알게 — 사용자 2026-10-15).
+     */
+    private fun fake(player: Player, joining: Boolean) {
+        // 기본 문구는 접두 없이 — 진짜 접속·퇴장 메시지처럼 보여야 한다. 타이틀포지가 있으면 그 모양으로 바뀐다.
+        val fallback = ess.messages.component(
+            if (joining) "admininfo-vanish-fake-join" else "admininfo-vanish-fake-quit",
+            Ph.of().player(displayName(player)),
+        )
+        val event = FakeConnectionEvent(player, joining, fallback)
+        Bukkit.getPluginManager().callEvent(event)
+        val message = event.message ?: return
         for (other in Bukkit.getOnlinePlayers()) {
-            if (other == player || other.hasPermission(Vanish.SEE_PERMISSION)) continue
+            if (other != player && other.hasPermission(Vanish.SEE_PERMISSION)) continue
             other.sendMessage(message)
         }
     }
