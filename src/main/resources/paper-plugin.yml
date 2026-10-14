@@ -1,0 +1,30 @@
+name: inmc-essentials
+version: '${version}'
+main: com.inmc.essentials.EssentialsPlugin
+api-version: '${apiVersion}'   # build.gradle.kts 의 inmc { paper } 에서 유도됨
+description: INMC 에센셜 - CMI 대체(이동·홈·워프·스폰·채팅·우편·플레이어·AFK·아이템·인벤·킷·월드·꾸밈·포탈·홀로그램·명령·서버·관리)
+authors: [ INMC ]
+
+# 필수 의존은 inmc-core 하나. 나머지는 전부 load: OMIT 이다 — BEFORE 를 걸면 Paper 가 의존성 순환을 보고
+# 우리 간선을 조용히 끊는다(가이드 함정 1). 연동은 리플렉션으로만 닿는다(ReflectionPurityTest).
+dependencies:
+  server:
+    inmc-core:           { load: BEFORE, required: true,  join-classpath: true }
+    PlaceholderAPI:      { load: OMIT,   required: false, join-classpath: true }
+    LuckPerms:           { load: OMIT,   required: false, join-classpath: true }
+    WorldEdit:           { load: OMIT,   required: false, join-classpath: true }
+    FastAsyncWorldEdit:  { load: OMIT,   required: false, join-classpath: true }
+    VotifierPlus:        { load: OMIT,   required: false, join-classpath: true }
+    Votifier:            { load: OMIT,   required: false, join-classpath: true }
+    CoreProtect:         { load: OMIT,   required: false, join-classpath: true }
+    InMc-TitleForge:     { load: OMIT,   required: false, join-classpath: true }
+    Multiverse-Core:     { load: OMIT,   required: false, join-classpath: true }
+
+# commands 절은 paper-plugin.yml 에 없다 - Brigadier 로 등록한다(command/CommandRegistry).
+
+# 여기에는 관리 루트 하나만 적는다. 기능의 권한은 각 기능이 Feature.permissions 로 내놓고 켤 때 등록한다 —
+# 여러 작업자가 이 파일 하나를 같이 고치지 않게(CLAUDE.md 3).
+permissions:
+  inmcessentials.admin:
+    description: /에센셜 - 리로드·검증·모듈 목록
+    default: op

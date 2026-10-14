@@ -1,0 +1,18 @@
+# inmc-essentials — 스폰(spawn) 운영 설정. /에센셜 리로드 로 다시 읽습니다.
+# 서버 스폰·첫 스폰·접속 때 보내기·부활 순서는 게임 안 /스폰 관리 에서 고칩니다(plugins/inmc-essentials/spawn.yml).
+# /스폰 의 대기·쿨타임·비용은 commands 기능 설정에서 명령 이름 '스폰' 에 겁니다(권장: 대기 3초 — 움직이거나 맞으면 취소).
+
+# 접속 직후 무적(초). 0 = 끔, 최대 60. (CMI Optimizations.ImmortalityOnJoin)
+join-invulnerable-seconds: 3
+
+# 부활 직후 무적(초) — 부활 지점 지키기(리스폰 캠핑) 막기. 0 = 끔, 최대 60. (CMI ReSpawn.Immortality)
+respawn-invulnerable-seconds: 3
+
+# false 면 부활 자리를 건드리지 않습니다 — 다른 플러그인에 맡길 때. (CMI ReSpawn.Enabled)
+handle-respawn: true
+
+# 처음 들어온 사람에게 첫 접속 킷을 줍니다(kits 기능이 켜져 있을 때 — 어떤 킷인지는 kits 설정). (CMI Newbie.Kit)
+first-join-kit: true
+
+# '매 접속 → 서버 스폰' 을 켰을 때, 이 월드에서 나갔던 사람은 나간 자리에서 시작합니다. (CMI Spawn.IgnoredWorlds)
+ignored-worlds: []

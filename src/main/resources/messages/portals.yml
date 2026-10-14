@@ -1,0 +1,63 @@
+# inmc-essentials — portals 기능의 메시지(포탈).
+# 키는 전부 "portals-" 로 시작하고, 코드의 messageDefaults 와 정확히 같아야 한다(ResourceTest).
+# 비운 값('')은 그 메시지를 끈다. 지운 키는 코드의 기본값으로 돈다.
+portals-usage: |-
+  <gold>/포탈</gold> <gray>— 목록 화면</gray>
+  <gold>/포탈 위치1 · 위치2</gold> <gray>— 선 블록을 모서리로(둘 다 찍으면 WorldEdit 선택보다 먼저, 쓰고 나면 지웁니다)</gray>
+  <gold>/포탈 만들기 <이름></gold> · <gold>영역 <이름></gold> <gray>— 선택으로 만들기 · 다시 정하기</gray>
+  <gold>/포탈 목적지 <이름> [여기|월드;x;y;z|지우기]</gold> · <gold>안전위치 <이름> [...]</gold>
+  <gold>/포탈 켜기|끄기 <이름></gold> · <gold>정보 · 편집 · 삭제 · 이동 <이름> [목적지]</gold> · <gold>가까이</gold>
+  <gold>/포탈 명령 <이름> [추가 <명령>|삭제 <번호>|비우기]</gold> <gray>— player: 로 시작하면 그 사람이, 아니면 콘솔이</gray>
+  <gold>/포탈 다시읽기</gold> <gray>— portals.yml 을 다시 읽기</gray>
+portals-no-permission: '<red>{포탈} 포탈을 쓸 권한이 없습니다.</red>'
+portals-cooldown: '<gray>{시간}초 뒤에 다시 쓸 수 있습니다.</gray>'
+portals-target-missing: '<red>포탈 {포탈} 의 위치(월드 {월드})가 없습니다.</red>'
+portals-teleport-failed: '<red>포탈 {포탈} 로 이동하지 못했습니다.</red>'
+portals-invalid-name: '<red>포탈 이름은 한글·영문·숫자·_- 32자까지입니다: {포탈}</red>'
+portals-exists: '<red>''{포탈}'' 포탈이 이미 있습니다.</red>'
+portals-not-found: '<red>''{포탈}'' 포탈이 없습니다.</red>'
+portals-no-selection: '<red>영역이 없습니다.</red> <gray>WorldEdit 으로 고르거나(//wand) /포탈 위치1 · /포탈 위치2 로 두 모서리를 찍으세요.</gray>'
+portals-too-big: '<red>영역이 너무 큽니다: {개수}블록(최대 {값}).</red>'
+portals-collides: '<red>{포탈} 포탈과 겹칩니다.</red>'
+portals-created: '<green>포탈 <white>{포탈}</white> 을(를) 만들었습니다.</green> <gray>{값} · {출처}</gray>'
+portals-source-corners: '/포탈 위치1·2 로 찍은 영역'
+portals-source-worldedit: 'WorldEdit 선택'
+portals-out-of-bounds: '<red>영역이 월드 경계 밖이거나 너무 넓게 걸칩니다(청크 {개수}개):</red> <gray>{값}</gray>'
+portals-particle-invalid: '<red>''{값}'' 은(는) 포탈에 쓸 수 있는 파티클이 아닙니다 — 그대로 둡니다.</red> <gray>(PORTAL · DUST · END_ROD · WITCH · FLAME … 데이터가 필요한 것은 DUST 만)</gray>'
+portals-hint-target: '<gray>목적지가 없습니다 — </gray><click:run_command:''/포탈 목적지 {포탈}''><hover:show_text:''<gray>지금 선 자리를 목적지로''><yellow>[여기를 목적지로]</yellow></hover></click> <click:run_command:''/포탈 편집 {포탈}''><yellow>[편집]</yellow></click>'
+portals-redefined: '<green>포탈 {포탈} 의 영역을 바꿨습니다.</green> <gray>{값} · {출처}</gray>'
+portals-corner: '<green>모서리 {값}:</green> <white>{월드} {좌표}</white>'
+portals-target-set: '<green>포탈 {포탈} 의 목적지: <white>{값}</white></green>'
+portals-target-cleared: '<yellow>포탈 {포탈} 의 목적지를 지웠습니다 — 명령만 돕니다.</yellow>'
+portals-safe-set: '<green>포탈 {포탈} 의 안전 위치: <white>{값}</white></green>'
+portals-safe-cleared: '<yellow>포탈 {포탈} 의 안전 위치를 지웠습니다 — 밀어냅니다.</yellow>'
+portals-location-invalid: '<red>위치를 읽지 못했습니다: {값}</red> <gray>(여기 · 월드;x;y;z;yaw;pitch · x y z)</gray>'
+portals-enabled: '<green>포탈 {포탈} 을(를) 켰습니다.</green>'
+portals-disabled: '<yellow>포탈 {포탈} 을(를) 껐습니다.</yellow>'
+portals-removed: '<green>포탈 {포탈} 을(를) 지웠습니다.</green>'
+portals-none: '<gray>포탈이 없습니다.</gray> <gray>/포탈 만들기 <이름></gray>'
+portals-list-header: '<gold>포탈 {개수}개:</gold>'
+portals-list-entry: '<click:run_command:''/포탈 정보 {포탈}''><white>{포탈}</white></click> <gray>{상태} · {영역} → {목적지}</gray>'
+portals-nearest: '<gold>가장 가까운 포탈: <white>{포탈}</white></gold> <gray>({값}블록)</gray> <click:run_command:''/포탈 편집 {포탈}''><yellow>[편집]</yellow></click>'
+portals-info: |-
+  <gold>포탈 <white>{포탈}</white></gold> <gray>({상태})</gray>
+  <gray>영역:</gray> <white>{영역}</white>
+  <gray>목적지:</gray> <white>{목적지}</white>
+  <gray>권한:</gray> <white>{권한}</white> <gray>· 명령 {개수}개 · 쿨타임 {시간}초</gray>
+portals-word-none: '없음'
+portals-word-on: '<green>켜짐</green>'
+portals-word-off: '<red>꺼짐</red>'
+portals-teleported: '<green>포탈 {포탈} 로 왔습니다.</green>'
+portals-commands-none: '<gray>포탈 {포탈} 에 명령이 없습니다.</gray> <gray>/포탈 명령 {포탈} 추가 <명령></gray>'
+portals-commands-header: '<gold>포탈 {포탈} 의 명령 {개수}개:</gold>'
+portals-commands-entry: '<gray>{순위}.</gray> <white>{값}</white> <click:run_command:''/포탈 명령 {포탈} 삭제 {순위}''><hover:show_text:''<red>눌러서 지우기''><red>[x]</red></hover></click>'
+portals-command-added: '<green>포탈 {포탈} 에 명령을 더했습니다({개수}번):</green> <white>{값}</white>'
+portals-command-removed: '<green>포탈 {포탈} 의 명령을 지웠습니다:</green> <white>{값}</white>'
+portals-commands-cleared: '<yellow>포탈 {포탈} 의 명령을 모두 지웠습니다.</yellow>'
+portals-command-index: '<red>명령 번호는 1~{값} 입니다.</red>'
+portals-effect-invalid: '<red>읽지 못한 효과(빼고 저장했습니다): {값}</red> <gray>효과:초:레벨</gray>'
+portals-reloaded: '<green>portals.yml 을 다시 읽었습니다 — 포탈 {개수}개</green> <gray>(못 읽은 칸 {값})</gray>'
+portals-reload-failed: '<red>portals.yml 을 YAML 로 읽지 못했습니다 — 지금 포탈 {개수}개를 그대로 쓰고, 고칠 때까지 저장하지 않습니다.</red> <gray>{값}</gray>'
+portals-locked: '<red>portals.yml 이 깨져 있어(YAML 오류) 고칠 수 없습니다 — 저장하면 파일을 덮습니다.</red> <gray>파일을 고치고 /포탈 다시읽기 · {값}</gray>'
+portals-rejected-exists: '<red>portals.yml 에 같은 이름의 못 읽은 포탈 ''{포탈}'' 이(가) 있습니다 — 파일을 먼저 고치세요(서버 로그에 까닭).</red>'
+portals-console-denied: '<red>콘솔 명령을 더하거나 바꿀 권한이 없습니다(inmcessentials.portals.console) — player: 를 붙이세요:</red> <white>{값}</white>'

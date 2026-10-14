@@ -1,0 +1,11 @@
+<AutoPage>
+<gold>서버 규칙</gold>
+<yellow>1.</yellow> <white>남의 건축물을 부수거나 훔치지 않습니다.</white>
+<yellow>2.</yellow> <white>도배·광고·욕설을 하지 않습니다.</white>
+<yellow>3.</yellow> <white>버그·핵·매크로를 쓰지 않습니다.</white>
+<yellow>4.</yellow> <white>다른 플레이어를 존중합니다.</white>
+<yellow>5.</yellow> <white>운영진의 안내를 따릅니다.</white>
+<NextPage>
+<gold>도움이 필요하면</gold>
+<white>운영진에게 귓속말하거나</white> <click:suggest_command:'/도움요청 '><aqua><u>/도움요청</u></aqua></click> <white>을 쓰세요.</white>
+<gray>이 글은 plugins/inmc-essentials/texts/rules.txt 입니다 — /텍스트 편집 rules</gray>

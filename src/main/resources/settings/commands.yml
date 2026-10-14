@@ -1,0 +1,83 @@
+# inmc-essentials — commands 기능 설정(명령어 체계). /에센셜 리로드 로 다시 읽는다.
+# 별칭은 commands/aliases.yml(/별칭 편집기), 이벤트 명령은 commands/events.yml, 일정은 commands/schedules.yml.
+# 자세한 설명: 플러그인 docs/commands.md
+
+# 한/영 자판 변환 — 한글 명령을 영어 자판으로(/tmvhs = /스폰) 치거나 영어 명령을 한글 자판으로(/넴주 = /spawn) 쳐도 실행.
+keyboard:
+  enabled: true
+  # 하위 명령(글자 자리만 — 사람 이름·자유 글 자리는 건드리지 않는다)도 바꾼다: /tmvhs tjfwjd = /스폰 설정
+  subcommands: true
+  # 탭 완성에 한글 명령의 영타형을 보인다(/tmv 에서 tmvhs 가 제안됨). 영어 명령의 한글형은 실행만.
+  tab-complete: true
+  # 없는 명령을 치면 "혹시 /스폰?" 안내(같은 키가 둘 이상일 때 등)
+  unknown-hint: true
+
+# 없는 명령이면 이름이 이만큼(%) 닮은 명령을 안내(CMI SimilarCommandChecker). 0 = 끔.
+similar:
+  threshold: 75
+
+# 서버에 있지만 권한이 없는 명령을 치면 "권한이 없습니다" 안내.
+permission-hint:
+  enabled: true
+  # true 면 누구나 마우스를 올려 필요한 권한 노드를 본다(false 면 inmcessentials.commands.seepermission 이 있는 사람만).
+  show-node: false
+
+# 같은(비슷한) 명령 반복 막기(CMI CommandFilter.Duplicate). 우회: inmcessentials.commands.spam.bypass
+spam:
+  enabled: false
+  # 이만큼(%) 닮으면 같은 명령으로 본다
+  similarity: 80
+  # 이 초 안에
+  interval: 5
+  # 이만큼 이미 쳤으면 막는다
+  max-repeats: 2
+  # 막지 않는 명령(이름·별칭)
+  whitelist: [msg, tell, w, 귓, r, 답장, login, register, l]
+
+# 명령 대기(워밍업) 표시.
+warmup:
+  # title · actionbar · bossbar · chat 중 고른다(여럿 가능, 비우면 처음 안내만)
+  display: [actionbar, title]
+  bossbar-color: blue
+  # 초마다 낼 소리(비우면 없음)
+  sound: block.note_block.hat
+  # 움직이면 취소되는 대기일 때 처음에 알린다
+  inform-on-no-move: true
+
+cost:
+  # cost-confirm 규칙의 확인을 기다리는 초
+  confirm-seconds: 15
+
+# 이벤트 명령 pvpstart/pvpend — 플레이어끼리 마지막으로 친 뒤 이 초가 지나면 싸움이 끝난 것으로
+combat-seconds: 15
+
+# 명령마다 대기·쿨타임·비용. 키(규칙 id)는 쿨타임 기록의 열쇠다 — 바꾸면 그 규칙의 기록이 처음부터.
+#   commands: 이 규칙을 걸 명령 이름(별칭은 적지 않아도 같은 명령이면 걸린다 — 우리 명령은 등록표로, 남의 명령은 Bukkit 이름으로 맞춘다)
+#   args: any(늘) · none(인자 없을 때만 — 예: /홈 만, 화면 열기) · some(인자 있을 때만)
+#   cooldown: 초. -1 = 평생 한 번. 0 = 없음
+#   group-cooldowns: { 권한노드: 초 } — 가진 것 중 가장 짧은 것이 기본값을 덮는다(LuckPerms 그룹이면 group.vip)
+#   warmup: 초. group-warmups: 위와 같음
+#   move: block(같은 블록 안) · any(어디로든) · 숫자(그 블록 수까지)
+#   cancel-on-damage: 대기 중 맞으면 취소
+#   cost: 금액 · currency: 화폐 id(비우면 기본 화폐) · cost-notify: 낸 뒤 알림 · cost-confirm: 확인을 받고 실행
+#   commit-on-success: true 면 명령이 **성공했을 때만** 쿨타임·비용(우리 이동 명령 — 홈·워프·스폰·이동 …). 남의 명령에는 쓰지 말 것
+#   우회: inmcessentials.commands.bypass.cooldown · .warmup · .cost (전부) · inmcessentials.commands.bypass.rule.<규칙 id>
+rules:
+  home-example:
+    enabled: false
+    commands: [홈]
+    args: any
+    cooldown: 10
+    warmup: 3
+    move: block
+    cancel-on-damage: true
+    cost: 0
+    commit-on-success: true
+  heal-example:
+    enabled: false
+    commands: [회복]
+    cooldown: 180
+    group-cooldowns:
+      group.vip: 60
+    cost: 100
+    cost-confirm: true

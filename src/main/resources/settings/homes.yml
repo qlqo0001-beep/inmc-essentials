@@ -1,0 +1,58 @@
+# inmc-essentials — 홈(homes) 설정. /에센셜 리로드 로 다시 읽습니다. (CMI Settings/Homes.yml 에 해당)
+
+# /홈설정 을 이름 없이 쳤을 때의 이름. 부활 순서의 '기본 홈' 칸도 이 이름의 홈을 찾습니다(없으면 가장 먼저 만든 홈). (CMI DefaultName)
+default-name: 집
+# 홈 이름에 쓸 수 있는 글자(정규식 — 이름 전체가 맞아야 합니다). CMI ValidNameRegex 는 '안 되는' 글자였고 여기는 '되는' 글자입니다.
+name-pattern: '[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ_-]+'
+name-max-length: 16
+# 같은 이름의 홈이 있으면 [덮어쓰기] 를 한 번 더 누르게 합니다. '/홈설정 이름 덮어쓰기' 는 바로 덮습니다. (CMI Confirmation)
+confirm-overwrite: true
+
+limits:
+  # 그룹·숫자 권한이 하나도 없을 때의 홈 개수. (CMI: 1)
+  default: 1
+  # 권한 inmcessentials.homes.limit.<그룹> 을 가진 사람의 홈 개수 — 여럿이면 큰 쪽.
+  # 숫자 권한 inmcessentials.homes.limit.<숫자> 도 됩니다(예: inmcessentials.homes.limit.10). 무제한: inmcessentials.homes.unlimited
+  # 이 노드들은 LuckPerms 등으로 '준' 것만 셉니다(op 라고 저절로 갖지 않습니다 — op 는 unlimited 를 기본으로 가집니다).
+  groups:
+    newbie: 2
+    advanced: 3
+    vip: 5
+  # 한도보다 홈이 많으면(강등 등) 홈 이동을 막습니다 — 지워서 한도 안으로 들어오면 풀립니다. (CMI Limits.BlockExtraHomes)
+  block-extra-homes: true
+  # 접속할 때 한도를 넘었으면 알립니다. (CMI Limits.NotifyOnLogin)
+  notify-on-login: true
+
+# 월드(묶음)별 홈 개수. amount 0 = 그 월드들에선 홈을 못 만듦, 음수 = 이 묶음을 무시. 우회: inmcessentials.homes.bypasslimit (CMI WorldLimits)
+world-limits:
+  use: false
+  groups:
+    example:
+      amount: 3
+      worlds:
+      - testWorld
+
+protection:
+  # 그 자리에서 블록을 부술 수 없으면(WorldGuard 구역·Lands 영지) 홈을 못 만들게 합니다. 우회: inmcessentials.homes.bypassprotection (CMI CheckBlockBreak)
+  check: false
+
+bed:
+  # 침대를 우클릭하면 '침대 홈' 을 만듭니다(권한 inmcessentials.homes.bed). 잠자기·바닐라 리스폰 지정은 그대로입니다. (CMI homeInteractions·BedInteraction)
+  enabled: true
+  # 웅크린 채 우클릭할 때만. (CMI onlyShiftBed)
+  shift-only: false
+  # 그 침대를 부수면 침대 홈을 지웁니다. 침대가 다른 까닭(폭발 등)으로 사라졌으면 이동할 때 알아채고 지웁니다. (CMI RemoveBedLocationOnBedBreak)
+  remove-on-break: true
+  # 침대 홈의 이름. (CMI DefaultBedName)
+  name: 침대
+  # 침대 홈도 홈 개수에 셉니다.
+  counts-toward-limit: false
+
+gui:
+  # 홈이 둘 이상이면 /홈 이 화면을 엽니다(끄면 채팅 목록). /홈목록 도 같습니다. (CMI Gui.Use)
+  use: true
+  # '/홈설정 이름 <칸>' 의 가장 큰 칸 번호(쪽당 45칸, 이어서 셉니다). (CMI MaxGuiSlots)
+  max-slot: 99
+  # 아이콘을 정하지 않은 홈의 재질.
+  default-icon: WHITE_BED
+  bed-icon: RED_BED

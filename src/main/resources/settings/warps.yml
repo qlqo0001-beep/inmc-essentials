@@ -1,0 +1,22 @@
+# inmc-essentials — 워프(warps) 설정. /에센셜 리로드 로 다시 읽습니다. (CMI config.yml Warps)
+# 워프 자체는 plugins/inmc-essentials/warps.yml 에 있습니다 — 게임 안 /워프편집 에서 고치세요.
+
+# /워프 를 이름 없이 치면 화면(끄면 채팅 목록). /워프그룹 도 같습니다. (CMI Warps.GUI)
+gui: true
+# 새 워프를 만들면 바로 편집 화면을 엽니다. (CMI GUIOnCreation)
+gui-on-creation: true
+# 워프 이름 길이. (CMI MinLength 4 · MaxLength 16 — 한글 이름이 짧아 기본 최소를 1 로 두었습니다)
+name-min-length: 1
+name-max-length: 16
+# 워프 이름에 쓸 수 있는 글자(정규식 — 이름 전체가 맞아야 합니다).
+name-pattern: '[a-zA-Z0-9가-힣ㄱ-ㅎㅏ-ㅣ_-]+'
+# 워프 설명에 만든 사람을 보입니다. (CMI showCreator)
+show-creator: false
+# 새 워프가 기본으로 권한을 요구합니다 — inmcessentials.warps.warp.<이름(소문자)>. (CMI requirePerm)
+require-permission: false
+# 만들기 권한(inmcessentials.warps.set)만 가진 사람이 만들 수 있는 워프 수. -1 = 무제한.
+# 숫자 권한 inmcessentials.warps.limit.<숫자> 가 있으면 그것(여럿이면 큰 쪽). 관리 권한(inmcessentials.warps.admin)은 제한 없음. (CMI cmi.command.setwarp.[n])
+default-limit: -1
+# 아이콘을 정하지 않은 워프의 재질 · 권한이 없어 잠긴 워프의 재질.
+default-icon: ENDER_PEARL
+locked-icon: GRAY_DYE

@@ -1,0 +1,56 @@
+# inmc-essentials — 갑옷 거치대·그림·액자·표지판(decor) 기능 설정. /에센셜 리로드 로 다시 읽는다.
+# 값이 이상하면 기본값으로 돈다. 지운 키는 이 배포 파일의 값으로 돈다. 괄호 안은 옮겨 온 CMI 설정 키.
+
+# 갑옷 거치대 편집기(armorstand 모듈 · Optimizations.ArmorStands)
+armorstand:
+  # 웅크리고 우클릭하면 편집기
+  shift-click: true
+  # 자세 한 칸(도) · 위치 한 칸(블록). Shift 와 함께 10배.
+  rotate-step: 5.0
+  move-step: 0.05
+  # 한 거치대를 처음 연 자리에서 이 거리(블록)까지만 옮긴다 — 조금씩 밀어 남의 땅에 넣지 못하게(우회: inmcessentials.decor.armorstand.move.unlimited)
+  max-move: 2.0
+  # 크기 범위(MinScale · MaxScale, 우회: inmcessentials.decor.armorstand.scale.unlimited = 0.0625~16)
+  min-scale: 0.5
+  max-scale: 3.0
+  # true 면 템플릿마다 inmcessentials.decor.armorstand.template.use.<이름> 권한이 있어야 꺼낸다(Templates.SpecificPermission)
+  template-permission: false
+  # /갑옷거치대 가까이 반경
+  near-radius: 16
+
+# 그림 바꾸기(paintingEditor) — 웅크리고 우클릭하면 같은 크기의 다음 그림, 그 뒤 이 초 동안 웅크린 채 휠로 넘긴다(0 = 휠 끔)
+painting:
+  enabled: true
+  scroll-seconds: 5
+
+# 표지판 다시 편집(signEdit · Signs · Optimizations.SignEdit)
+sign-edit:
+  enabled: true
+  # 웅크려야 편집(RequireSneaking). 맨손일 때만. 밀랍칠한 표지판은 늘 웅크려야 하고(입력창으로 열린다), 클릭 명령이 든 면은 명령이 먼저다.
+  # 바닐라가 맨손 우클릭으로 여는 편집 화면에도 듣는다 — true 면 웅크리지 않은 우클릭은 편집 화면을 열지 않는다(false = 바닐라 그대로).
+  require-sneaking: true
+  # 바닐라 표지판 화면 대신 입력창으로(DialogEditor)
+  dialog: false
+  # 첫 줄이 이것이면 편집·복사 금지(대소문자 무시, 우회: inmcessentials.decor.sign.blacklist.bypass)
+  blacklist:
+    - '[Shop]'
+    - '[Private]'
+    - '[More Users]'
+    - '[Everyone]'
+    - '[AdminShop]'
+    - '[ChestShop]'
+    - '[CMIElevator]'
+
+# 동적 표지판(dynamicSigns)
+dynamic-sign:
+  # 새로 만들 때의 갱신 주기(초) · 작동 범위(블록)
+  default-interval: 5
+  default-range: 16
+  max-signs: 200
+  # {스크롤} 줄이 한 번에 보여 주는 글자 수
+  marquee-width: 15
+
+# /액자 … 주변 — 기본 반경 · 최대 반경
+item-frame:
+  radius: 8
+  max-radius: 32

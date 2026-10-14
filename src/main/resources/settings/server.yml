@@ -1,0 +1,65 @@
+# inmc-essentials — server 기능 설정(서버 관리). /에센셜 리로드 로 다시 읽는다.
+# 명령으로 바꾸는 것(점검 켬·사유, /서버소개, /최대인원)은 server/state.yml 에 남는다(재시작해도 유지).
+# 자세한 설명: 플러그인 docs/server.md
+
+# 서버 목록(멀티플레이 화면)
+motd:
+  enabled: true
+  # 두 줄(MiniMessage · & 색). 비우면 server.properties 의 motd 그대로 — /서버소개 로 바꾼 것이 이것보다 먼저
+  lines: []
+  # 인원에 마우스를 올렸을 때 보일 줄(비우면 접속자 이름 그대로)
+  hover: []
+  # 목록에 보일 최대 인원(0 = 실제 값)
+  max-players: 0
+  # 투명(vanish)인 사람을 인원수·이름 목록에서 뺀다
+  hide-vanished: true
+
+# 점검 모드(/점검 켜기 [사유]) — 우회: op · inmcessentials.server.maintenance.bypass · 아래 allow
+maintenance:
+  kick-message: "<red>서버 점검 중입니다.</red>\n<gray>잠시 뒤에 다시 들어와 주세요.</gray>"
+  # 점검 중 서버 목록 두 줄
+  motd:
+  - '<red>■ 서버 점검 중</red>'
+  - '<gray>잠시 뒤에 다시 와 주세요</gray>'
+  # 서버 목록 오른쪽 위에 빨갛게 보일 글(비우면 그대로)
+  version-text: '점검 중'
+  # 켤 때 우회가 아닌 접속자를 내보낸다
+  auto-kick: true
+  # 점검 중임을 보스바로(우회해서 들어온 사람에게)
+  bossbar: true
+  bossbar-color: red
+  # 권한 플러그인 없이도 들일 이름·uuid
+  allow: []
+
+# 가득 찬 서버에 inmcessentials.server.fullbypass(또는 op)면 들인다
+full-server:
+  bypass-enabled: true
+
+status:
+  # /서버상태 월드 — 월드마다 엔티티·타일이 가장 많은 청크 몇 개
+  busiest-chunks: 3
+  # /서버상태 틱 — 이 TPS 밑으로 내려간 초를 "느려진 순간" 으로
+  spike-below: 18.0
+
+texts:
+  # 접속할 때 보일 텍스트 이름(texts/<이름>.txt). 비우면 끔(CMI 의 Motd: welcomeMessage)
+  join-text: ''
+  # <AutoPage> 텍스트의 한 쪽 줄 수
+  lines-per-page: 10
+
+books:
+  # /책 으로 만든 책의 저자
+  default-author: Server
+  # 책 설명에 만든 날짜
+  add-date: false
+  # 플레이어가 쓰는 책의 최대 쪽 수(inmcessentials.server.book.unlimited 면 무제한)
+  max-pages: 50
+
+# 명령·채팅 기록(plugins/inmc-essentials/logs/)
+logs:
+  commands: false
+  chat: false
+  # 이 날짜보다 오래된 기록 파일은 지운다(0 = 지우지 않음)
+  keep-days: 30
+  # 인자를 가리는 명령(비밀번호)
+  hidden-commands: [login, l, register, reg, changepassword, 로그인]

@@ -1,0 +1,40 @@
+# inmc-essentials — 홀로그램 설정 (CMI config.yml 의 Holograms.Defaults 를 옮김). /에센셜 리로드 로 다시 읽는다.
+# 홀로그램 자체는 plugins/inmc-essentials/holograms.yml(게임 안에서 /홀로그램 으로 고친다).
+
+# 홀로그램마다 정하지 않았을 때 보이는 거리(블록) — CMI viewRange.
+view-range: 16
+
+# 글 다시 그리기 주기(초) 기본값 — CMI Interval.Update(틱 단위였다). 0 = 안 함(그러면 %server_online% 같은 줄이 처음 값에 멈춘다).
+# 플레이스홀더·{player} 가 있는 줄만, update-range 안에 보는 사람이 있는 것만, 그리고 글이 바뀐 때만 보낸다 — 짧게 둬도 싸다.
+update-seconds: 2
+
+# 자동 쪽 넘김(초) 기본값 — CMI pageChangeInterval(틱 단위였다). 0 = 안 함.
+page-seconds: 0
+
+# 줄 높이(크기 1 기준, 블록) — 글 줄 · 아이콘 줄.
+line-height: 0.28
+icon-height: 0.55
+
+# 사람마다 다른 글({player} · 사람 플레이스홀더)을 보여 줄 사람 수의 상한(홀로그램 하나에). 이미 자기 글을 보던 사람이 먼저다.
+# 넘는 사람은 공용 글을 본다 — {player} 와 사람 플레이스홀더 자리에는 아래 personal-fallback 이 들어간다.
+# 사람마다 엔티티가 한 벌씩 생기므로 너무 크게 두지 말 것.
+max-personal-viewers: 30
+
+# 상한을 넘어 공용 글을 보는 사람에게 {player} · 사람 플레이스홀더 자리에 보일 글(비우면 지운다).
+personal-fallback: ''
+
+# 이 거리(블록) 안에 보는 사람이 있을 때만 글을 다시 그린다 — CMI Defaults.updateRange. 0 = 보이는 거리 전체.
+# 홀로그램마다 따로 정할 수 있다(편집 화면 · holograms.yml 의 update-range).
+update-range: 8
+
+# 이것으로 시작하는 PAPI 는 사람과 무관한 것으로 본다 — 모두가 엔티티 하나를 같이 본다(%server_online% 같은 것).
+global-placeholders:
+  - 'server_'
+  - 'math_'
+  - 'time_'
+
+# 같은 사람의 클릭 사이 최소 간격(밀리초).
+click-cooldown-ms: 250
+
+# 새 홀로그램(·여기로 옮기기)을 선 사람 눈높이에서 얼마나 위에(블록). 위치는 첫 줄의 윗자리이고 줄은 아래로 쌓인다.
+create-height: 0.6

@@ -1,0 +1,183 @@
+# inmc-essentials — 아이템(items) 설정. /에센셜 리로드 로 다시 읽습니다.
+# (CMI config.yml 의 Optimizations.Commands.Give/Clear · ItemRenaming · Optimizations.ItemName/ItemLore · ShulkerBoxes · Dye · search,
+#  Settings/CustomHeads.yml 의 EntityHeads 에 해당)
+
+give:
+  # /지급 ** — 최근 이 날 안에 들어온 사람 전원(오프라인은 우편으로). 명령에 -d:<일> 을 붙이면 그 값. (CMI giveall offline)
+  offline-days: 30
+  # 한 번에 줄 수 있는 최대 개수(아이템 하나마다).
+  max-amount: 2304
+  # 여러 사람에게 줄 때 한 틱에 몇 명씩 — 서버가 멈추지 않게 나눠 줍니다.
+  recipients-per-tick: 200
+  # 받은 사람에게 알림(-s 를 붙이면 그 명령만 끔).
+  notify-target: true
+
+# 이름(/이름)·설명(/설명)·모루 이름 바꾸기 제한. 우회: inmcessentials.items.rename.bypass
+naming:
+  # 이름 최대 글자(색 빼고). 0 = 제한 없음. (CMI ItemRenaming.MaxLength)
+  name-max-length: 64
+  # 설명 한 줄 최대 글자(색 빼고). 0 = 제한 없음. (CMI Optimizations.ItemLore.MaxLength)
+  lore-max-length: 64
+  # /설명 을 쓸 수 없는 재질. (CMI ItemLore.TypeBlackList)
+  lore-type-blacklist:
+  - gold_nugget
+  # 바꾼 아이템에 표식을 붙입니다(PDC inmcess:modified_name · inmcess:modified_lore). (CMI MarkChanged)
+  mark-changed: false
+  # true 면 아래 rules 에 걸리는 이름을 막습니다. (CMI ItemRenaming.Prevent)
+  prevent: false
+  # true 면 이름 바꾸기 자체를 막습니다(명령·모루). (CMI ItemRenaming.GlobalDisable)
+  global-disable: false
+  # 원래 이름도 검사합니다 — 규칙에 걸리는 이름을 가진 아이템은 다른 이름으로도 못 바꿉니다. (CMI CheckSource)
+  check-source: true
+  # '재질:정규식' — 정규식이 이름 전체와 맞으면 막습니다. 재질 자리에 * 는 전부. (CMI ItemRenaming.List)
+  rules:
+  - 'spawner:([A-z]+ (?i)\w*spawner)'
+  # 모루 이름 바꾸기에도 위 제한을 겁니다. (CMI Modules anvilRename)
+  anvil: true
+  # 모루 이름에 색(& 코드 · MiniMessage)을 넣게 합니다 — inmcessentials.items.itemname.color 가 있는 사람만.
+  anvil-colors: true
+  # 모루로 색을 넣은 이름을 바닐라처럼 기울임꼴로 둡니다(글 안에서 <!i> 로 끌 수 있음). (CMI ItemRenaming.Anvil.ItalicByDefault)
+  anvil-italic-by-default: true
+
+# 셜커 상자 배낭 — 가방 안의 셜커 상자를 놓지 않고 엽니다. (CMI Modules shulkerBackpack · ShulkerBoxes)
+shulker-backpack:
+  enabled: true
+  # true 면 가방에서 Shift+우클릭으로만 엽니다(그냥 우클릭은 바닐라대로 집기).
+  shift-only: false
+  # 손에 들고 허공을 우클릭해도 엽니다(블록을 보고 누르면 바닐라대로 놓습니다).
+  open-from-hand: true
+  # 전투 중(맞거나 때린 뒤 combat-seconds 초)에는 못 엽니다. (CMI PreventInCombat)
+  prevent-in-combat: true
+  # true 면 inmcessentials.items.shulker.edit 권한이 있어야 내용을 고칩니다(없으면 보기만). (CMI RequirePermission)
+  require-edit-permission: false
+  # 열 때마다 드는 돈(0 = 없음). 면제: inmcessentials.items.shulker.free (CMI CostToOpen)
+  cost: 0.0
+  # 돈의 화폐 id(비우면 기본 화폐).
+  currency: ''
+  # true 면 달리기·활공·탈것 중에는 못 열고, 연 채로 move-tolerance 블록 넘게 움직이면 닫습니다.
+  prevent-while-moving: false
+  move-tolerance: 1.5
+  # 커스텀 아이템(inmc · MMOItems · ItemsAdder …)인 셜커 상자도 배낭으로 엽니다. 끄면(기본) 그 플러그인의 우클릭 능력·배낭을 건드리지 않습니다.
+  allow-custom-items: false
+
+clear:
+  # 조건 없이 전부 비울 때 [확인] 을 한 번 더 누르게 합니다. (CMI Clear.Confirmation)
+  confirm: true
+  # 이것이 붙은 아이템은 지우지 않습니다. (CMI Clear.Exclude)
+  # - 'NBT:<경로>' — 아이템의 custom_data 안 경로(CMI 와 같은 꼴, 예: 'NBT:ItemJoin Name' · 'NBT:ItemJoin.Name' — 점은 한 겹 아래)
+  # - '<네임스페이스>:<이름>' — PDC 열쇠(예: 'inmcess:modified_name')
+  exclude: []
+
+dye:
+  # 움직이는 색(무지개·낮밤·바이옴·체력 …)은 염색받은 사람이 입었을 때만 바뀝니다. (CMI Dye.BoundToPlayer)
+  bound-to-player: false
+  # 움직이는 색을 다시 칠하는 주기(초). 입은 갑옷만 봅니다.
+  period-seconds: 1
+  # 정의에 색이 있는 inmc 커스텀 아이템에도 움직이는 색을 허용합니다(그 아이템을 다시 그리면 정의의 색으로 돌아갑니다).
+  allow-dynamic-on-colored-custom-items: false
+
+search:
+  # 결과를 이만큼까지 모읍니다.
+  max-results: 2000
+  # /검색 지우기 — 찾은 아이템을 접속 중인 사람에게서 지웁니다(확인 한 번 더). (CMI search.EnablePurge)
+  enable-purge: false
+  # 결과를 plugins/inmc-essentials/search/ 에 남깁니다. (CMI search.LogIntoFile)
+  log-into-file: true
+  page-size: 10
+
+# 맞거나 때린 뒤 이 초 동안 '전투 중'(셜커 배낭 막기 · 염색 combat 모드).
+combat-seconds: 10
+
+# /몹머리 — 몹 → 머리 목록(여럿이면 무작위). 재질 이름(ZOMBIE_HEAD) 또는 텍스처 해시(textures.minecraft.net/texture/<해시>).
+# CMI Settings/CustomHeads.yml EntityHeads 에서 옮겼습니다.
+mob-heads:
+  allay: ['beea845cc0b58ff763decffe11cd1c845c5d09c3b04fe80b0663da5c7c699eb3']
+  armadillo: ['9164ed0e0ef69b0ce7815e4300b4413a4828fcb0092918543545a418a48e0c3c']
+  axolotl: ['e8a8a2d7ccf0c3746e23ab5491070e0923f05b235f9a2f5d53d384353853bddc']
+  bat: ['4cf1b3b3f539d2f63c172e94cacfaa391e8b385cdd633f3b991c74e44b28']
+  bee: ['99dc3f00ecab2249bb6a16c8c5115ceb9f23205a0d55cc0e9babd2562f7959c4', 'e6b74e052b74288799ba6d9f35c5d0221cf8b04331547ec2f68d73597ae2c9b', 'bb17774662512d787ef77b1a46a04e2c6fd67794bf7f779566eb21c8143aad9e', '947322f831e3c168cfbd3e28fe925144b261e79eb39c771349fac55a8126473']
+  blaze: ['b78ef2e4cf2c41a2d14bfde9caff10219f5b1bf5b35a49eb51c6467882cb5f0']
+  bogged: ['a3b9003ba2d05562c75119b8a62185c67130e9282f7acbac4bc2824c21eb95d9']
+  breeze: ['a275728af7e6a29c88125b675a39d88ae9919bb61fdc200337fed6ab0c49d65c']
+  camel: ['74b8a333dfa92e7e5a95ad4ae2d84b1bafa33dc28c054925277f60e79dafc8c4']
+  camel_husk: ['3bd7a92a6f67b7500d16c4e12f28058ec2859311556ba03be2d1f581170f2db6']
+  cat: ['58803f0270f8cdf4e0fe9732d4967cccc0a2f4fcd118cd15000979b18885144f', '7c9b7409e7b5383c19b362b2a0cb43d5093b13e2b234e8a1891563e55eae9d68']
+  cave_spider: ['41645dfd77d09923107b3496e94eeb5c30329f97efc96ed76e226e98224']
+  chicken: ['1638469a599ceef7207537603248a9ab11ff591fd378bea4735b346a7fae893']
+  cod: ['6f99b580d45a784e7a964e7d3b1f97cece74911173bd21c1d7c56acdc385ed5']
+  copper_golem: ['99e24e94dbe42e230d83293a77d61ff7101a8c68ab68bbc6a93f9630fb2fdb4', 'cc2aab8a0fec3cc06a4d47480e024f88f2b07bc96ee09e5331e5f4db6b273885', '982d5c944f80795d613c22405c027edbd2a5544882acbab974a02f547c15468d']
+  cow: ['5d6c6eda942f7f5f71c3161c7306f4aed307d82895f9d2b07ab4525718edc5', 'c5a9cd58d4c67bccc8fb1f5f756a2d381c9ffac2924b7f4cb71aa9fa13fb5c']
+  creaking: ['de373fa534c7c3f9340d33c32c213402a2cf8917e750eb8bc8710fcd3ee9a15d']
+  creeper: ['CREEPER_HEAD', 'f4254838c33ea227ffca223dddaabfe0b0215f70da649e944477f44370ca6952', 'a3f172d29cf94bc895608b7a5dc2af0de49c788d5becb1605f1f53488a0170b8', 'f2ceb39dd4de24a7adfe291a3a0cfc7cf4f645de59b603fcfe06c6b5a06e26']
+  dolphin: ['8e9688b950d880b55b7aa2cfcd76e5a0fa94aac6d16f78e833f7443ea29fed3']
+  donkey: ['dfb6c3c052cf787d236a2915f8072b77c547497715d1d2f8cbc9d241d88a']
+  drowned: ['56daf50eaf76c3a6d5ad39c966f29877b91d950dd1e37122e9c819585c89d92e', 'c3f7ccf61dbc3f9fe9a6333cde0c0e14399eb2eea71d34cf223b3ace22051', '1f8baa48b8f511990e47db968324c152bd1167731ddf034530044735a6bd2ed4', 'c1a73252401a6e946f61dbac0e027d183e0ace58752fa15a64d2449fcf5087b7', 'fb1531c04e25d7fa6457698268491cb896d3302d26884fcfdf1a0b2f92d77c8f', 'c84df79c49104b198cdad6d99fd0d0bcf1531c92d4ab6269e40b7d3cbbb8e98c']
+  elder_guardian: ['1c797482a14bfcb877257cb2cff1b6e6a8b8413336ffb4c29a6139278b436b']
+  ender_dragon: ['DRAGON_HEAD', 'ffcdae586b52403b92b1857ee4331bac636af08bab92ba5750a54a83331a6353']
+  enderman: ['7a59bb0a7a32965b3d90d8eafa899d1835f424509eadd4e6b709ada50b9cf']
+  endermite: ['84aaffa4c09e2eafb85d3522122db0aa45874bea4e3f5e7566b4d166c7df8']
+  evoker: ['a00d3fff16c2dca59b9c58f096525c86971166dbae133b1b050e5ee716443']
+  fox: ['24a0347436434eb13d537b9eb6b45b6ef4c5a78f86e91863ef61d2b8a53b82', 'b6feb761b2f59fabe5cc3cc82a934b534ea99edb9132ccda9f484bd5986d7', '16db7d507389a14bbec39de6922165b32d43657bcb6aaf4b5182825b22b4']
+  frog: ['d0edcb898356fd400c205c6134e098610bafbbc50417729a155ce77d7bca98d4']
+  ghast: ['8b6a72138d69fbbd2fea3fa251cabd87152e4f1c97e5f986bf685571db3cc0']
+  giant: ['ec455b38368dae730ef1483c1df25cd87b41bee441ef3ab1f3c60f21bfe0e511']
+  glow_squid: ['2ecd0b5eb6b384db076d8446065202959dddff0161e0d723b3df0cc586d16bbd']
+  goat: ['3a4986fdf04cc86d8aff2037a6b4df573cdc1e708d05790c76728faef796f33a']
+  guardian: ['dfb675cb5a7e3fd25e29da8258f24fc020b3fa950362b8bc8eb252e56e74']
+  happy_ghast: ['a1a36cb93d01675c4622dd5c8d872110911ec12c372e89afa8ba03862867f6fb', 'ec79f9082f6abeed975074443be8c8a79ea1060d61094ff79a04989340430624', '24b5a472dce93505d4a4401a74ce29ecee88e326428bc103cbad4d939abed1b']
+  hoglin: ['9bb9bc0f01dbd762a08d9e77c08069ed7c95364aa30ca1072208561b730e8d75']
+  horse: ['61902898308730c4747299cb5a5da9c25838b1d059fe46fc36896fee662729']
+  husk: ['7770681d1a255fb4f754793aa055b220441cdab9e1141dfa5237b49931d9b91c']
+  illusioner: ['2f2882dd09723e47c0ab9663eab083d6a5969273706110c82910e61bf8a8f07e', '512512e7d016a2343a7bff1a4cd15357ab851579f1389bd4e3a24cbeb88b']
+  iron_golem: ['89091d79ea0f59ef7ef94d7bba6e5f17f2f7d4572c44f90f76c4819a714']
+  llama: ['4d67fd4bff293269cb908974dca83c33485e435ed5a8e1dbd6521c61687140', '80277e6b3d9f7819efc7da4b42745f7ab9a63ba8f36d6b84a7a250c6d1a358eb', 'c2b1ecff77ffe3b503c30a548eb23a1a08fa26fd67cdff389855d74921368', 'cf24e56fd9ffd7133da6d1f3e2f455952b1da462686f753c597ee82299a']
+  magma_cube: ['38957d5023c937c4c41aa2412d43410bda23cf79a9f6ab36b76fef2d7c429']
+  mooshroom: ['d0bc61b9757a7b83e03cd2507a2157913c2cf016e7c096a4d6cf1fe1b8db']
+  mule: ['a0486a742e7dda0bae61ce2f55fa13527f1c3b334c57c034bb4cf132fb5f5f']
+  nautilus: ['fb1648482733a7c3bb84be468d575e3fbd3ff193281b0727ead8deadea60237a', '3bb340dd3302615348de5162fe1670b9c5c9c616cd92d2de9d8398cb33e842ae']
+  ocelot: ['ab881c39b3afdcc79f91fe5de3cdd015bc3353843f591f4d23cd3027de4e6', '5657cd5c2989ff97570fec4ddcdc6926a68a3393250c1be1f0b114a1db1', 'a755e7df04d18b31d63c17f4a7b4c73924bd6265da69e113eddd97516fc7', 'f2a662f2ae7debee65292c2bf42fbb09b97b2ffbdb270520c2db96e51d8945']
+  panda: ['d188c980aacfa94cf33088512b1b9517ba826b154d4cafc262aff6977be8a']
+  parched: ['24aeceff5f26dd8413c5c03547c234ac03108d187af0b9cd834a8ce12598591c']
+  parrot: ['b78e1c5f48a7e12b262853571ef1f597a92ef58da8faafe07bb7c0e69e93', 'dac6703ded46d939a620fe22c43e18674e13d23c9744be036b3483c1d1cdd', '3d6f4a21e0d62af824f8708ac63410f1a01bbb41d7f4a702d9469c6113222', 'f0bfa850f5de4b2981cce78f52fc2cc7cd7b5c62caefeddeb9cf311e83d9097', 'f8a82c8b75dd1c2ce8133c0ba939b8c52e47d3ec374950f47dddbbe345e20', 'a4ba8d66fecb1992e94b8687d6ab4a5320ab7594ac194a2615ed4df818edbc3', 'ab9a36c5589f3a2e59c1caa9b3b88fada76732bdb4a7926388a8c088bbbcb', 'aca580b051c63be29da545a9aa7ff7e136df77a81c67dc1ee9e6170c14fb310', '2b94f236c4a642eb2bcdc3589b9c3c4a0b5bd5df9cd5d68f37f8c83f8e3f1']
+  phantom: ['ad2fa5618447762e26111e060dc593ea622d5ddfc385d7e42532e46327f807c0', '411d25bcdabafad5fd6e010c5b1cf7a00c9cca40c5a46747f706dc9cb3a']
+  pig: ['c3abd44ae67d9c9254d177e9658da84843389d5e1ffd2af1fb51217c75c298', '621668ef7cb79dd9c22ce3d1f3f4cb6e2559893b6df4a469514e667c16aa4']
+  piglin: ['PIGLIN_HEAD', '9f18107d275f1cb3a9f973e5928d5879fa40328ff3258054db6dd3e7c0ca6330']
+  piglin_brute: ['3e300e9027349c4907497438bac29e3a4c87a848c50b34c21242727b57f4e1cf']
+  pillager: ['4aee6bb37cbfc92b0d86db5ada4790c64ff4468d68b84942fde04405e8ef5333']
+  polar_bear: ['d46d23f04846369fa2a3702c10f759101af7bfe8419966429533cd81a11d2b']
+  pufferfish: ['a9559388993fe782f67bd58d98c4df56bcd430edcb2f66ef5777a73c27de3']
+  rabbit: ['c977a3266bf3b9eaf17e5a02ea5fbb46801159863dd288b93e6c12c9cb', '72c58116a147d1a9a26269224a8be184fe8e5f3f3df9b61751369ad87382ec9', 'cb8cff4b15b8ca37e25750f345718f289cb22c5b3ad22627a71223faccc']
+  ravager: ['1cb9f139f9489d86e410a06d8cbc670c8028137508e3e4bef612fe32edd60193', '3b62501cd1b87b37f628018210ec5400cb65a4d1aab74e6a3f7f62aa85db97ee']
+  salmon: ['adfc57d09059e4799fa92c15e28512bcfaa1315577fe3a27aed389e4f752289a']
+  sheep: ['1836565c7897d49a71bc18986d1ea6561321a0bbf711d41a56ce3bb2c217e7a', 'a55ad6e5db5692d87f51511f4e09b39ff9ccb3de7b4819a7378fce8553b8', 'ae52867afef38bb14a26d1426c8c0f116ad34761acd92e7aae2c819a0d55b85', '2ac74a2b9b91452e56fa1dda5db81077856e49f27c6e2de1e841e5c95a6fc5ab', 'a017215c7f8db82040aa2c47298b66541c2eb5f7f93040a5d23d88f0687d4b34', '92a2448f58a491332434e85c45d786d874397e830a3a7894e6d92699c42b30', '1c8a97a38856514a16413e2c99521289f4c5363dc82fc9b2834cfedac78b89', 'f098397a270b4c3d2b1e574b8cfd3cc4ea3409066cefe31ea993633c9d576', 'd9ec22818d1fbfc8167fbe36728b28240e34e16469a2929d03fdf511bf2ca1', '46f6c7e7fd514ce0acc68593229e40fcc4352b841646e4f0ebcccb0ce23d16', '26a4112df1e4bce2a5e28417f3aaff79cd66e885c3724554102cef8eb8', 'ce1ac683993be35512e1be31d1f4f98e583edb1658a9e21192c9b23b5cccdc3', '839af477eb627815f723a5662556ec9dfcbab5d494d338bd214232f23e446', '32652083f28ed1b61f9b965df1abf010f234681c21435951c67d88364749822', '4287eb501391f275389f166ec9febea75ec4ae951b88b38cae87df7e24f4c', 'f31f9ccc6b3e32ecf13b8a11ac29cd33d18c95fc73db8a66c5d657ccb8be70']
+  shulker: ['1e73832e272f8844c476846bc424a3432fb698c58e6ef2a9871c7d29aeea7']
+  silverfish: ['da91dab8391af5fda54acd2c0b18fbd819b865e1a8f1d623813fa761e924540']
+  skeleton: ['SKELETON_SKULL', '301268e9c492da1f0d88271cb492a4b302395f515a7bbf77f4a20b95fc02eb2', 'b95078d3b3b1701d45729d3a1422467b29dbb2e1a9128133a2f163ebe85d2db9']
+  skeleton_horse: ['47effce35132c86ff72bcae77dfbb1d22587e94df3cbc2570ed17cf8973a']
+  slime: ['16ad20fc2d579be250d3db659c832da2b478a73a698b7ea10d18c9162e4d9b5']
+  sniffer: ['87ad920a66e38cc3426a5bff084667e8772116915e298098567c139f222e2c42']
+  snow_golem: ['1fdfd1f7538c040258be7a91446da89ed845cc5ef728eb5e690543378fcf4']
+  spider: ['cd541541daaff50896cd258bdbdd4cf80c3ba816735726078bfe393927e57f1']
+  squid: ['01433be242366af126da434b8735df1eb5b3cb2cede39145974e9c483607bac']
+  stray: ['78ddf76e555dd5c4aa8a0a5fc584520cd63d489c253de969f7f22f85a9a2d56']
+  strider: ['18a9adf780ec7dd4625c9c0779052e6a15a451866623511e4c82e9655714b3c1']
+  sulfur_cube: ['205ec0241f084e1776a201f6df8c124c8637671fd85e0af5e77090f4e9c38602']
+  tadpole: ['b23ebf26b7a441e10a86fb5c2a5f3b519258a5c5dddd6a1a75549f517332815b']
+  trader_llama: ['8424780b3c5c5351cf49fb5bf41fcb289491df6c430683c84d7846188db4f84d', 'be4d8a0bc15f239921efd8be3480ba77a98ee7d9ce00728c0d733f0a2d614d16', '7087a556d4ffa95ecd2844f350dc43e254e5d535fa596f540d7e77fa67df4696']
+  tropical_fish: ['36d149e4d499929672e2768949e6477959c21e65254613b327b538df1e4df']
+  turtle: ['0a4050e7aacc4539202658fdc339dd182d7e322f9fbcc4d5f99b5718a']
+  vex: ['5e7330c7d5cd8a0a55ab9e95321535ac7ae30fe837c37ea9e53bea7ba2de86b']
+  villager: ['822d8e751c8f2fd4c8942c44bdb2f5ca4d8ae8e575ed3eb34c18a86e93b']
+  vindicator: ['daeed9d8ed1769e77e3cfe11dc179668ed0db1de6ce29f1c8e0d5fe5e6573b60']
+  wandering_trader: ['5f1379a82290d7abe1efaabbc70710ff2ec02dd34ade386bc00c930c461cf932']
+  warden: ['6cf3674b2ddc0ef7c39e3b9c6b58677de5cf377d2eb073f2f3fe50919b1ca4c9']
+  witch: ['89e8b5f15a9b29a1e389c95218fd3795f32872e5aee9464a76495c527d2245']
+  wither: ['a435164c05cea299a3f016bbbed05706ebb720dac912ce4351c2296626aecd9a', '3e4f49535a276aacc4dc84133bfe81be5f2a4799a4c04d9a4ddb72d819ec2b2b', 'cdf74e323ed41436965f5c57ddf2815d5332fe999e68fbb9d6cf5c8bd4139f', '964e1c3e315c8d8fffc37985b6681c5bd16a6f97ffd07199e8a05efbef103793', 'ddafb23efc57f251878e5328d11cb0eef87b79c87b254a7ec72296f9363ef7c']
+  wither_skeleton: ['WITHER_SKELETON_SKULL', '7953b6c68448e7e6b6bf8fb273d7203acd8e1be19e81481ead51f45de59a8', 'f5ec964645a8efac76be2f160d7c9956362f32b6517390c59c3085034f050cff', '496bc8ebd4e13f496d8d74c565dd56e99a4af2e2ea7a27a96c1abd284184b']
+  wolf: ['69d1d3113ec43ac2961dd59f28175fb4718873c6c448dfca8722317d67', 'e95cbb4f75ea87617f2f713c6d49dac3209ba1bd4b9369654b1459ea15317']
+  zoglin: ['e67e18602e03035ad68967ce090235d8996663fb9ea47578d3a7ebbc42a5ccf9']
+  zombie: ['ZOMBIE_HEAD', '56fc854bb84cf4b7697297973e02b79bc10698460b51a639c60e5e417734e11', '311dd91ee4d31ddd591d2832ea1ec080f2eded33ab89ee1db8b04b26a68a']
+  zombie_horse: ['d22950f2d3efddb18de86f8f55ac518dce73f12a6e0f8636d551d8eb480ceec']
+  zombie_nautilus: ['fd9a933376da44c3391307cb9f4cf03f16f3a54f495fd5a11bad8a373f9d5720']
+  zombie_villager: ['37e838ccc26776a217c678386f6a65791fe8cdab8ce9ca4ac6b28397a4d81c22', 'cff0482fd32fab2ce9f5fa2e2d9b4dc7561da422152c99fc804b9139caf256b', '961f19ffd8ae425792c4b181756adff8d48174aeef58a0f327a28c742c72442', 'a16155fcf366cf4e06ce5dffc48ca54e8ea48dfe525358b612dc44fd432', '44f08ebd4e25cda3ade45b863378ad377f18c510db4d28e82bb24451439b3734', '528c2bad5389cb3592b565b3c47ecc189e0542a87835028d6148bbe3345645']
+  zombified_piglin: ['7eabaecc5fae5a8a49c8863ff4831aaa284198f1a2398890c765e0a8de18da8c']

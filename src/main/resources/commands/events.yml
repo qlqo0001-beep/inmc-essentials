@@ -1,0 +1,88 @@
+# inmc-essentials 이벤트 명령 — CMI EventCommands.yml 과 같은 이름·모양. /에센셜 리로드 로 다시 읽는다.
+# 사건이 일어나면 Commands 를 콘솔로 실행한다(줄 앞에 asPlayer! 를 붙이면 그 사람으로).
+# 변수: [playerName] [playerDisplayName] [lvl] [exp] [hp] [maxHp] [hunger] [gameMode] [world] [x] [y] [z] · PlaceholderAPI
+#   playerKillPlayer·playerDeath 의 SourceCommands 는 죽인 사람으로: [sourceName] [sourceDisplayName] [sourceLvl] …
+#   [value]·[value2] 는 사건마다(월드 이름·게임 모드·레벨·발전 과제 id/이름·추방 사유)
+# 특수 머리: delay! 0.3 · msg! <이름> <글> · broadcast! · actionbar! · title! · subtitle! · kickall! · perm:<노드>! · asConsole! · asPlayer!
+# CancelEvent: true 는 취소할 수 있는 사건만(playerPreWorldChange · bedEnter · playerGameModeChange · playerKick · playerBan ·
+#   elytraStartGlide · sneakingSwapHandItems · swapHandItems).
+# 첫 접속(firstJoinServer)에는 joinServer 가 돌지 않는다.
+firstJoinServer:
+  Enabled: false
+  Commands:
+  - 'broadcast! <yellow>[playerName]</yellow>님이 처음 오셨습니다! 환영해 주세요.'
+joinServer:
+  Enabled: false
+  Commands: []
+quitServer:
+  Enabled: false
+  Commands: []
+playerDeath:
+  Enabled: false
+  Commands: []
+  SourceCommands: []
+playerKillPlayer:
+  Enabled: false
+  Commands: []
+  SourceCommands: []
+playerRespawn:
+  Enabled: false
+  Commands: []
+playerTeleport:
+  Enabled: false
+  Commands: []
+bedEnter:
+  Enabled: false
+  CancelEvent: false
+  Commands: []
+bedLeave:
+  Enabled: false
+  Commands: []
+playerWorldChange:
+  Enabled: false
+  Commands: []
+playerPreWorldChange:
+  Enabled: false
+  CancelEvent: false
+  Commands: []
+playerGameModeChange:
+  Enabled: false
+  CancelEvent: false
+  Commands: []
+playerKick:
+  Enabled: false
+  CancelEvent: false
+  Commands: []
+playerBan:
+  Enabled: false
+  Commands: []
+playerLevelChange:
+  Enabled: false
+  Commands: []
+voidFall:
+  Enabled: false
+  Commands: []
+elytraStartGlide:
+  Enabled: false
+  CancelEvent: false
+  Commands: []
+elytraEndGlide:
+  Enabled: false
+  Commands: []
+advancementDone:
+  Enabled: false
+  Commands: []
+sneakingSwapHandItems:
+  Enabled: false
+  CancelEvent: false
+  Commands: []
+swapHandItems:
+  Enabled: false
+  CancelEvent: false
+  Commands: []
+pvpstart:
+  Enabled: false
+  Commands: []
+pvpend:
+  Enabled: false
+  Commands: []

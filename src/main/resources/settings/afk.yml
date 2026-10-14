@@ -1,0 +1,115 @@
+# inmc-essentials — 잠수(afk) 기능 설정. /에센셜 리로드 로 다시 읽는다.
+# 값이 이상하면 기본값으로 돈다. 지운 키는 이 배포 파일의 값으로 돈다. 괄호 안은 옮겨 온 CMI Settings/Afk.yml 키.
+# 기능 전체를 끄려면 config.yml 의 modules.afk: false (재시작).
+
+# 이 초 동안 활동이 없으면 자동 잠수(AutoAfkIn). 0 = 자동 잠수 없음(/잠수 만). 권한 inmcessentials.afk.auto(기본 모두)
+auto-afk-seconds: 300
+# 자동 잠수·자동 추방을 보는 주기(초, CheckInterval)
+check-interval: 10
+# 자동 잠수가 걸리지 않는 월드(DisabledWorlds)
+disabled-worlds: []
+
+# 잠수 중 화면 가운데 제목(TitleMessage)과 무작위 부제(SubTitleMessage — 메시지 afk-subtitle-1~5 중 빈 것 빼고)
+title: true
+subtitle: true
+
+# 들어가기·나오기 알림(볼 수 있는 사람에게만 — 투명인 사람의 잠수는 새지 않는다)
+broadcast:
+  enter: true
+  leave: true
+
+# 들어갈 때·나올 때 칠 명령(AutoAfkCmds · ManualAfkCmds · LeaveCmds.Auto/Manual).
+# 콘솔이 친다. "player:" 로 시작하면 그 사람이 친다. {player} {reason} {time}(잠수가 된 뒤 지난 시간) {idle}(마지막 활동 뒤 쉰 시간) 을 바꿔 넣는다.
+# {reason} 은 사람이 친 글이라 < > { } [ ] § & \ / | ; " 와 낱말 앞의 - 를 지워 넣는다(명령·태그를 끼워 넣지 못하게).
+commands:
+  auto-enter: []
+  manual-enter: []
+  leave-manual: []
+  leave-auto: []
+  # 투명인 사람도 알림·명령을 돌린다(끄면 상태만 바뀐다)
+  when-vanished: false
+
+# 손으로 잠수(/잠수)
+manual:
+  # 때리거나 맞은 뒤 이 초 동안은 스스로 /잠수 를 못 한다(관리자의 /잠수 -p:<이름> 은 막지 않음). 0 = 막지 않음
+  combat-block-seconds: 15
+
+# 잠수 중 보호
+protect:
+  # 피해를 받지 않는다(허공·/kill 은 그대로) (PreventDamage)
+  damage: true
+  # 손으로(/잠수) 잠수한 사람은 이 초가 지나야 피해 보호를 받는다 — 싸우다 /잠수 로 무적이 되지 않게(자동 잠수는 바로). 0 = 바로
+  damage-manual-delay: 30
+  # 피해 보호를 하지 않는 월드 — 던전(쓰러짐·전멸 판정을 막지 않게)
+  damage-disabled-worlds:
+    - inmc_dungeon
+  # 잠수인 사람이 때린 피해가 들어가지 않는다 — 잠수 사냥터 막기(PreventMobDamage)
+  mob-damage: true
+  # 낚싯대로 끌려가지 않는다(PreventHook)
+  hook: true
+  # 밀리지 않는다 — 충돌을 끄고 넉백을 막는다(PreventPushing, 실험적)
+  pushing: false
+  # 아이템·경험치를 줍지 않는다(DisableItemPickup · DisableExpPickup)
+  item-pickup: false
+  exp-pickup: false
+  # 셜커가 노리지 않는다(Disable.ShulkerTargeting)
+  shulker-targeting: true
+  # 잠수인 사람 근처의 몹 생성 막기(PreventMobSpawning) — 반경 안에 깨어 있는 사람이 없을 때만
+  mob-spawning:
+    enabled: false
+    natural: false
+    spawners: true
+    village-defence: true
+    radius: 64
+
+# 우회 막기
+anti-abuse:
+  # 제자리 뛰기(높이만 바뀌는 움직임·점프 키)는 활동이 아니다(PreventJumping)
+  prevent-jumping: true
+  # 같은 블록·같은 아이템으로 같은 동작을 1초 안에 되풀이하면 처음 한 번만 활동(SmartInteractCheck)
+  smart-interact-check: true
+  # 이동 키를 누르지 않고 옮겨진 것(물길·피스톤 기계)은 활동이 아니다(AntiAfkMachines)
+  anti-afk-machines: true
+
+# 활동으로 볼 것(DisableOn*) — 끈 것은 잠수를 풀지도, 쉰 시간을 되돌리지도 않는다
+leave-on:
+  interact: true
+  inventory-click: true
+  item-drop: true
+  command: true
+  public-chat: true
+  private-chat: true
+  move: true
+  look-around: false
+  # 낚싯대를 든 우클릭(던지기·거두기)과 물고기 낚기
+  fishing: false
+
+# 자동 추방(AutoKickTimes) — 잠수가 된 뒤 이 초가 더 지나면. 손으로 잠수한 사람은 auto-afk-seconds 를 더 기다린다.
+# 면제: inmcessentials.afk.kickbypass · 사람별 시간: inmcessentials.afk.kickoutin.<초>(가장 큰 것, 이것이 이긴다)
+auto-kick:
+  # -1 = 끔(Default)
+  seconds: -1
+  # 이 인원 이상일 때만(FromPlayerCount)
+  from-player-count: 0
+  # [인원]-[초] — 잠수가 될 때의 인원 이하 중 가장 큰 것(ByPlayerCount)
+  by-player-count:
+    - 10-600
+    - 20-500
+    - 30-400
+    - 40-350
+    - 50-300
+  # 추방 대신(또는 추방 명령이 안 내보냈으면) repeat-interval 초마다 다시(RepeatKickCommand · RepeatingAutoKickInterval)
+  repeat: false
+  repeat-interval: 300
+  # 비우면 기본 추방(메시지 afk-kick-reason). 예) "kick {player} {time} 넘게 잠수" — 여기의 {time} 은 쉰 시간(기본 추방 문구와 같다)
+  commands: []
+
+# 잠수인 사람에게 귓속말하면 보낸 사람에게 "답하지 못할 수 있다" 알림(afk.MayNotRespond).
+# 스태프(inmcessentials.afk.staff)면 afk-may-not-respond-staff
+# chat 기능이 켜져 있으면 알림은 chat 이 맡는다(실제로 전해졌을 때만 · 사유 없이) — 이 알림은 다른 귓속말 플러그인을 쓸 때만 돈다.
+# 아래 명령 목록은 그와 상관없이 "귓속말 활동"(leave-on.private-chat) 판정에 쓰인다.
+may-not-respond:
+  enabled: true
+  whisper-commands: [msg, tell, w, m, whisper, 귓, 귓말, 귓속말, pm, dm]
+  # 받는 사람이 명령에 안 적히는 답장(시계만 되돌린다 — 귓속말 활동)
+  reply-commands: [r, reply, 답장]

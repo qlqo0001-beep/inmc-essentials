@@ -1,0 +1,43 @@
+# inmc-essentials — 인벤토리(inventory) 설정. /에센셜 리로드 로 다시 읽습니다.
+# (CMI config.yml 의 Optimizations.Commands.Inv · inv · Modules silentChest 에 해당)
+
+inv:
+  # 이 사람들의 가방·엔더는 열 수 없습니다(op 는 우회). 이름으로 적습니다. (CMI Inv.BlackList)
+  blacklist: []
+  # true 면 접속하지 않은 사람의 가방·엔더 보기를 막습니다. (CMI Inv.DisableOffline)
+  disable-offline: false
+  # 나갈 때(그리고 서버를 끌 때) 가방·엔더를 DB 에 남깁니다 — 접속하지 않은 사람 보기·고치기(/인벤 · /엔더)와 /인벤저장 ** 의 근거.
+  # 끄면 오프라인 보기·고치기를 쓸 수 없습니다.
+  snapshot-on-quit: true
+  # 오프라인 편집을 들어온 뒤(또는 그 MV 그룹 월드로 옮긴 뒤) 몇 틱 기다렸다가 적용합니다(1~100).
+  # Multiverse-Inventories 가 자기 프로필을 먼저 다 얹게 하는 여유입니다. 그 사이 가방이 바뀌면 칸별로 얹습니다.
+  offline-apply-delay-ticks: 2
+
+# 저장 인벤(/인벤저장 · /인벤불러오기 · /인벤목록 · /인벤삭제). (CMI config.yml inv)
+saved:
+  # 죽을 때 가방을 저장합니다. (CMI SaveOnDeath)
+  save-on-death: false
+  # 빈 가방(가방·엔더 모두 빔)은 죽을 때 저장하지 않습니다. (CMI IgnoreEmpty)
+  ignore-empty: false
+  # true 면 inmcessentials.inventory.saveondeath 권한이 있는 사람만 죽을 때 저장합니다. (CMI RequiresPermission)
+  requires-permission: false
+  # 한 사람당 남기는 저장 수 — 넘으면 오래된 것부터 지웁니다. (CMI SavedInventories)
+  # 불러오기 전 백업은 따로 셉니다(백업이 직접 저장·죽음 저장을 밀어내지 않고, 막 불러온 저장도 그때 지우지 않습니다).
+  keep-per-player: 5
+  # 불러오기 전에 받는 사람의 지금 가방을 한 번 저장합니다(덮어써서 잃지 않게 — CMI 에는 없음). 금지 재질도 거르지 않고 그대로,
+  # 덮는 그 틱에 잡습니다. DB 에 쓰지 못하면 plugins/inmc-essentials/inventory-backups/ 파일로 남깁니다.
+  backup-before-load: true
+  # 불러올 때 되돌릴 것. (CMI inv.restore)
+  restore:
+    hp: true
+    xp: true
+    food: true
+    saturation: true
+    potions: true
+    items: true
+  # 저장하지 않는 재질. (CMI restore.BlackListedItems)
+  blacklisted-items: []
+
+silent-chest:
+  # 투명 중이면 /몰래열기 를 켜지 않아도 조용히 엽니다(CMI Vanish noisyChest: false 와 같은 뜻).
+  auto-when-vanished: true

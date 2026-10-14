@@ -1,0 +1,35 @@
+# inmc-essentials — 포탈 설정 (CMI config.yml 의 Portals 를 옮김). /에센셜 리로드 로 다시 읽는다.
+# 포탈 자체는 plugins/inmc-essentials/portals.yml(게임 안에서 /포탈 로 고친다).
+
+# 파티클을 몇 초마다 뿌리나(CMI CheckParticleInterval — 우리 반복 작업은 1초 단위라 1초가 가장 짧다).
+# 들어서기 판정(CMI CheckInterval)은 주기가 없다 — 걸음마다 블록이 바뀔 때 바로 본다. 한 걸음에 1블록 넘게 가도(겉날개·급류)
+# 지나간 블록을 다 본다(한 걸음 64블록까지) — 빨리 지나가도 얇은 포탈을 놓치지 않는다.
+particle-seconds: 1
+
+# 권한이 없어 막을 때 밀어내는 세기(0 = 걷기만 취소).
+push-strength: 0.6
+
+# 한 포탈의 최대 크기(블록 수) — 실수로 큰 영역을 고르지 않게. portals.yml · CMI 를 읽을 때도 본다(넘는 포탈은 읽지 않고 남긴다 — 로그).
+# 이와 따로 월드 경계(±30,000,000) 밖 · 청크 65,536개 넘게 걸치는 영역은 늘 받지 않는다.
+max-volume: 200000
+
+# 새로 만드는 포탈의 기본값(CMI Portals.Defaults). 만든 뒤에는 포탈마다 /포탈 편집 에서 바꾼다.
+defaults:
+  # 목적지가 없어도 명령·효과를 돌까(CMI PerformCommands).
+  commands-without-target: true
+  # 명령(CMI Commands). 앞에 player: 를 붙이면 그 사람이, 아니면 콘솔이 친다. {player} · PAPI.
+  commands: []
+  # 들어설 때 거는 효과 — 효과:초:레벨(CMI 기본 명령 'cmi effect [playerName] blindness 2 1 -s' 를 명령 없이).
+  effects:
+    - 'blindness:2:1'
+  # 같은 사람이 다시 쓰기까지(초).
+  cooldown-seconds: 2
+  # 쓸 때 소리(비우면 없음).
+  sound: 'entity.enderman.teleport'
+  kick-back: true
+  inform-permission: true
+  particles:
+    enabled: true
+    type: PORTAL
+    amount: 20
+    range: 8

@@ -1,0 +1,15 @@
+# inmc-essentials — spawn 기능의 메시지(스폰·첫 접속).
+# 키는 전부 "spawn-" 로 시작하고, 코드의 messageDefaults 와 정확히 같아야 한다(ResourceTest).
+# 비운 값('')은 그 메시지를 끈다. 지운 키는 코드의 기본값으로 돈다.
+spawn-done: '<green>스폰으로 이동했습니다.</green>'
+spawn-failed: '<red>스폰으로 이동하지 못했습니다.</red>'
+spawn-failed-other: '<red>{대상}님을 스폰으로 보내지 못했습니다.</red>'
+spawn-sent: '<green>{대상}님을 스폰으로 보냈습니다.</green>'
+spawn-sent-target: '<yellow>{플레이어}님이 당신을 스폰으로 보냈습니다.</yellow>'
+spawn-set: '<green>서버 스폰을 정했습니다:</green> <white>{값}</white>'
+spawn-first-set: '<green>첫 스폰을 정했습니다:</green> <white>{값}</white> <gray>(처음 들어온 사람이 서는 곳)</gray>'
+spawn-first-cleared: '<yellow>첫 스폰을 지웠습니다 — 처음 들어온 사람은 서버 스폰으로 갑니다.</yellow>'
+spawn-warp-set: '<green>부활 워프를 <white>{워프}</white>(으)로 정했습니다.</green> <gray>부활 순서에서 ''부활 워프'' 칸을 켜세요.</gray>'
+spawn-warp-cleared: '<yellow>부활 워프를 지웠습니다.</yellow>'
+spawn-warp-missing: '<red>''{워프}'' 워프가 없습니다.</red>'
+spawn-warp-removed: '<yellow>워프 {워프} 은(는) 부활 워프였습니다 — 부활 순서의 ''부활 워프'' 칸은 건너뜁니다.</yellow> <gray>/스폰 관리 에서 다른 워프를 고르세요.</gray>'

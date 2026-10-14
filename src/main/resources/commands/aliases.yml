@@ -1,0 +1,19 @@
+# inmc-essentials 사용자 별칭 — /별칭 편집기가 이 파일을 다시 씁니다(주석은 남지 않습니다). 손으로 고치면 /에센셜 리로드.
+# commands: 줄마다 명령(앞 / 없이). $1 = 첫 인자 · $1- = 첫 인자부터 끝까지 · $0 = 친 이름 · delay! 3 = 3초 뒤 나머지
+#   특수 머리: asConsole! · asPlayer! · fromConsole! · perm:<노드>! · moneycost:<금액>! · expcost:<경험치>! · allPlayers!
+#              msg! <이름> <글> · broadcast! · actionbar! · title! <제목>\n<부제> · subtitle! · kickall!   (docs/commands.md)
+# permission: '' = 누구나 · true = inmcessentials.commands.alias.<이름> · 그 밖 = 그 권한 노드
+# tab-completions: 인자 자리마다 한 줄(빈칸으로 여럿, [player]·[world]). 비우면 첫 명령의 탭 완성을 빌림
+# exact: true 면 이름만 쳤을 때만(인자가 붙으면 같은 이름의 원래 명령으로)
+# 이름에 빈칸을 넣으면 하위 명령 별칭(예: '스폰 설정'), ? 는 아무 낱말(예: 'ca ?').
+aliases:
+  규칙:
+    enabled: false
+    commands:
+    - 텍스트 rules
+    permission: ''
+    description: 서버 규칙 보기
+    usage: ''
+    tab: true
+    tab-completions: []
+    exact: false

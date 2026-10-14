@@ -1,0 +1,32 @@
+# inmc-essentials 일정 — CMI Schedules.yml 과 같은 키. /에센셜 리로드 로 다시 읽고, /일정 으로 보고·돌리고·켜고 끈다.
+# Enabled: 켜기
+# Delay: 초마다(PerformOn 이 없을 때만 — 켠 때부터 셈)
+# PerformOn: 정해진 시각들(목록). 칸: Month(1~12) · Day(1~31 또는 요일 이름: monday·월요일·월) · FirstMonthDay/LastMonthDay(그 달 첫/마지막 ○요일) ·
+#   Hour(0~23) · Minute · Second. 빠진 칸: 월·일·요일·시 = 아무 때나, 분·초 = 0.  예) - Hour: 4   → 매일 04:00:00
+# Repeat: false 면 이번 서버 실행에서 한 번만
+# MinPlayers / MaxPlayers: 접속자(투명 빼고) 조건. 모자라면 MinPlayersCommands 를 대신 실행. FeedBack: 건너뛴 까닭을 콘솔에
+# Randomize: 명령 중 하나씩(다 쓸 때까지 겹치지 않게) · DuplicateRandomize: 하나씩(겹쳐도 됨) · SingleLinear: 하나씩 차례로
+# DontTranslatePlaceholders: true 면 PlaceholderAPI 를 풀지 않고 넘긴다
+# Commands: 콘솔로 실행. ;; 로 한 줄에 여럿. 특수 머리: delay! 5 · msg! <이름> <글> · broadcast! · actionbar! · title! · subtitle! ·
+#   kickall! · allPlayers!(명령 속 [allPlayers] 에 접속자마다) · perm:<노드>! · [randomPlayer](inmcessentials.commands.schedule.exclude 가 있는 사람은 빠짐) ·
+#   %rand/1-5%
+Announcer:
+  Enabled: false
+  MinPlayers: 1
+  FeedBack: false
+  Delay: 600
+  Repeat: true
+  Randomize: true
+  Commands:
+  - 'broadcast! <yellow>규칙은 <white>/텍스트 rules</white> 에서 볼 수 있습니다.'
+  - 'broadcast! <yellow>도움이 필요하면 <white>/도움요청</white> 을 쓰세요.'
+DailyRestartNotice:
+  Enabled: false
+  PerformOn:
+  - Hour: 3
+    Minute: 59
+    Second: 30
+  Commands:
+  - 'actionbar! <yellow>30초 뒤 서버를 다시 켭니다.'
+  - delay! 20
+  - 'actionbar! <red>10초 뒤 서버를 다시 켭니다.'

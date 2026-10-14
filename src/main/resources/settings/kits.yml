@@ -1,0 +1,16 @@
+# inmc-essentials — 킷(kits) 설정. /에센셜 리로드 로 다시 읽습니다. (CMI config.yml Kits 에 해당)
+# 킷 자체는 /킷편집 으로 만들고 고칩니다(DB ess_kits 에 저장 — 공용 DB 면 서버끼리 같은 킷).
+
+# /킷 을 화면으로 엽니다(false 면 채팅 목록). (CMI Kits.GUI)
+gui: true
+# 받을 권한이 없는 킷도 잠긴 모습으로 보여 줍니다.
+show-locked: true
+# 화면의 빈 칸을 채웁니다. (CMI Kits.FillEmptyFields)
+fill-empty: true
+# '마지막으로 받은 때' 의 꼴. (CMI Kits.DateFormat)
+date-format: 'yyyy-MM-dd HH:mm'
+# 같은 그룹(CMI Group/CommandName) 킷의 무게(Weight) 뜻:
+#   priority — CMI 와 같습니다. 받을 수 있는 것 중 무게가 가장 높은 킷만 받고 낮은 것은 막힙니다(킷의 '밀려도 보이기' 를 켜면
+#              목록·미리보기에는 보임 = CMI ShowDespiteWeight). /킷 <그룹> 은 그 하나를 줍니다.
+#   random   — /킷 <그룹> 이 지금 받을 수 있는 것 중 무게로 하나를 뽑고, 그룹 전체에 쿨타임·횟수 기록을 남깁니다.
+group-mode: priority

@@ -1,0 +1,34 @@
+# inmc-essentials — 공통 메시지(모든 기능이 같이 쓰는 것 · 관리 명령 · core 보상/우편함/순위가 부르는 것).
+# 기능의 메시지는 messages/<기능>.yml. 비운 값('')은 그 메시지를 끈다. 지운 키는 코드의 기본값으로 돈다.
+# 자리표시: {플레이어} {대상} {값} {개수} {금액} {월드} {시간} {사유} {이름} {아이템} {순위} {시즌} (영문 {player} … 도 같다)
+
+prefix: '<gradient:#56ab2f:#a8e063>[ 에센셜 ]</gradient> '
+player-only: '<red>플레이어만 쓸 수 있습니다.</red>'
+no-permission: '<red>권한이 없습니다.</red>'
+player-not-found: '<red>''{값}'' 은(는) 접속 중인 플레이어가 아닙니다.</red>'
+user-not-found: '<red>''{값}'' 은(는) 이 서버에 온 적이 없는 플레이어입니다.</red>'
+invalid-number: '<red>숫자가 아닙니다: {값}</red>'
+feature-disabled: '<red>이 기능은 꺼져 있습니다.</red>'
+reloaded: '<green>다시 불러왔습니다.</green> <gray>(기능 {개수}개)</gray>'
+reload-restart-needed: '<yellow>저장소·기능 켜고 끄기는 서버를 다시 켜야 바뀝니다.</yellow>'
+modules-header: '<gold>기능 {개수}개</gold> <gray>— config.yml 의 modules 에서 켜고 끕니다(재시작)</gray>'
+module-on: '<green>●</green> <white>{값}</white>'
+module-off: '<dark_gray>○ {값} (꺼짐)</dark_gray>'
+module-failed: '<red>✖ {값}</red> <gray>(켜다 실패 — 서버 로그를 보세요)</gray>'
+verify-done: '<green>검증 끝 — 통과 {금액} · 실패 {개수}</green> <gray>(plugins/inmc-essentials/verify/ 에 기록)</gray>'
+verify-failure: '<red>✖</red> <gray>{값}</gray>'
+help-admin: |-
+  <red>/에센셜 리로드</red> <gray>- config·메시지·기능 설정 다시 읽기</gray>
+  <red>/에센셜 검증</red> <gray>- 서버 안 자동 검사</gray>
+  <red>/에센셜 모듈</red> <gray>- 기능 목록과 켜짐</gray>
+reward-inventory-full: '<yellow>가방이 가득 차서 일부 보상을 우편으로 보냈습니다.</yellow> <gray>/우편</gray>'
+reward-dropped: '<yellow>가방이 가득 차서 일부 보상을 바닥에 떨어뜨렸습니다.</yellow>'
+reward-announce: '<gold>★</gold> <yellow>{플레이어}</yellow>님이 <yellow>{이름}</yellow>에서 <aqua>{아이템}</aqua>을(를) 받았습니다!'
+mailbox-waiting: '<yellow>받지 않은 보상이 {개수}개 있습니다.</yellow> <gray>/우편</gray>'
+mailbox-money-held: '<yellow>돈을 주지 못해 금액 보상을 그대로 보관합니다.</yellow>'
+rank-reward-received: '<gold>{이름} {순위}위 보상을 받았습니다!</gold>'
+rank-reset-broadcast: '<gold>▶</gold> <yellow>{이름}</yellow> <gray>시즌 {시즌} 이(가) 끝났습니다. 순위 보상을 보냈습니다.</gray>'
+prompt-enter: '<yellow>채팅으로 값을 입력하세요.</yellow> <gray>(취소: 취소)</gray>'
+prompt-cancelled: '<gray>입력을 취소했습니다.</gray>'
+prompt-timeout: '<gray>입력 시간이 지났습니다.</gray>'
+prompt-invalid-number: '<red>숫자를 입력해 주세요.</red>'

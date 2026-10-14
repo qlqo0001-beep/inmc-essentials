@@ -1,0 +1,150 @@
+# inmc-essentials — 플레이어 상태·능력(player) 기능 설정. /에센셜 리로드 로 다시 읽는다.
+# 값이 이상하면 기본값으로 돈다. 지운 키는 이 배포 파일의 값으로 돈다. 괄호 안은 옮겨 온 CMI 설정 키.
+
+# /최대체력 — 기본 최대 체력의 상한(Optimizations.MaxHp). spigot.yml settings.attribute.maxHealth.max 보다 크면 그것이 상한이다.
+maxhp:
+  cap: 1000.0
+
+# /회복 — 나쁜 효과 지우기(heal.RemoveNegative). -ignoreeffects(CMI 철자 -ignoreffects 도)를 붙이면 지우지 않는다.
+heal:
+  remove-negative: true
+  negative-effects:
+    - blindness
+    - nausea
+    - instant_damage
+    - hunger
+    - poison
+    - slowness
+    - mining_fatigue
+    - weakness
+    - wither
+    - darkness
+
+# /배고픔 <양> — 20 을 넘게 정할 수 있게(hunger.overide). 바닐라 화면은 20 까지만 그린다.
+feed:
+  allow-over-max: false
+
+# 나가 있는 동안에도 포션 효과 시간이 흐른다(PotionEffects.DeductWhileOffline) — 다시 들어올 때 그만큼 줄인다.
+effect:
+  deduct-while-offline: false
+
+# 무적인 동안 배고픔이 줄지 않는다.
+god:
+  keep-hunger: true
+
+fly:
+  # 죽기 전에 날 수 있었으면 다시 살아났을 때 비행을 돌려준다(WorldLimits.ReenabledFlyAfterDeath)
+  restore-after-death: false
+  # /비행·/시간제비행 으로 켠 사람은 서바이벌·어드벤처로 바꿔도 비행을 다시 켠다(바닐라는 끈다)
+  keep-on-gamemode-change: true
+
+# 시간제 비행·무적(timedCommands)
+timed:
+  # 남은 초가 이 값일 때 "곧 끝납니다" 를 알린다
+  warn-at: [60, 30, 10, 5, 3, 2, 1]
+  # 시간제 비행이 날던 중에 끝나면 그 착지(1분 안)의 낙하 피해를 한 번 막는다
+  tfly-landing-protection: true
+
+# /모자 · 가방 화면의 머리 칸(Optimizations.Hat)
+hat:
+  block:
+    # 설명(로어)이 붙은 아이템은 막는다(투구·머리는 상관없음)
+    with-lore: false
+    # 블록·몹 머리·투구가 아닌 것(칼·도구·음식 …)은 막는다
+    non-hat-items: true
+    # 인첸트가 붙은 "모자 아닌 것" 은 막는다
+    non-hat-enchanted: true
+  # 비우면 모두 허용. 적으면 이 재질만 머리에 쓸 수 있다(예: glass, sea_lantern)
+  whitelist: []
+  # 가방 화면의 머리 칸에 커서의 아이템을 놓아 모자로 쓰기(권한 inmcessentials.player.hat.inventory).
+  # 바닐라가 받는 것(투구·몹 머리·호박)은 권한 없이 바닐라 그대로. 쓰던 것이 귀속 저주면 창작 모드가 아니면 바꾸지 않는다
+  inventory-slot: true
+
+# 앉기 · 의자(Animations)
+sit:
+  # 빈손으로 계단·반 블록(·카펫)을 우클릭하면 앉는다(SitOnStairs, 권한 inmcessentials.player.sit.chair)
+  chairs: true
+  stairs: true
+  slabs: true
+  carpets: false
+  # 피해를 받으면 일어난다(RemoveFromChairOnDamage)
+  stand-on-damage: true
+  # 빠르게 두 번 눌러야 앉는다(DoubleClick · DoubleClickDelay)
+  double-click: false
+  double-click-millis: 200
+  # 의자 블록까지의 거리(ChairRange)
+  chair-range: 4.0
+  # 좌석 높이 보정(블록) — 앉은 모습이 뜨거나 묻혀 보이면 조절
+  height-offset: 0.0
+
+# /타기 · /내리기(rideAnimation)
+ride:
+  # 사람 위에 탄 채 블록에 끼어 숨이 막히면 내려 준다
+  eject-on-suffocation: true
+  # 아무도 탈 수 없는 종류(엔티티 열쇠)
+  blacklist:
+    - ender_dragon
+    - wither
+  # 바라보는 개체·이름으로 고른 사람까지의 최대 거리
+  max-distance: 6.0
+
+# /근처(Optimizations.Commands.Near)
+near:
+  default-distance: 200
+  # /근처 <거리> 의 최대
+  max-distance: 1000
+  # 정확한 거리 대신 방향과 대략 거리(~100m). 권한 inmcessentials.player.near.exact 는 정확히 본다
+  approximate: true
+  invisibility:
+    # 투명 물약을 먹은 사람은 목록에서 뺀다
+    hide: false
+    # hide 일 때 빼지 않고 이름만 알아볼 수 없게
+    obfuscate: false
+  # 이름을 누르면 그 사람 쪽을 입자로 가리킨다(PointTo)
+  point-to: true
+  # 보여 줄 줄 수(Count)
+  count: 10
+
+# /자살 — 전체에 알린다(투명인 사람은 볼 수 있는 사람에게만)
+suicide:
+  broadcast: true
+
+# 불사의 토템(Totem)
+totem:
+  # 손에 없어도 가방의 토템을 쓴다(RemoveFromInventory). 사람마다 /토템 으로 끌 수 있다
+  from-inventory: false
+  # 가방 속 토템에 권한 inmcessentials.player.totem.inventory 가 필요(RequirePermission)
+  require-permission: false
+  # 토템을 쓴 뒤 이 초 동안 다시 못 쓴다(Cooldown, 0 = 없음)
+  cooldown-seconds: 0
+  # 토템이 터진 뒤 이 초 동안은 토템 없이도 다시 살아난다(Warmup, 0 = 없음)
+  warmup-seconds: 0
+  # 토템을 가진 채 허공에 떨어지면 토템 하나를 쓰고 리스폰 자리로(ProtectFromVoid)
+  protect-from-void: true
+  # 부활 효과 시간(초, 0 = 그 효과 없음). 바닐라는 45 / 40 / 5
+  effects:
+    regeneration: 45
+    fire-resistance: 40
+    absorption: 5
+  # 손대지 않는 월드(BlackListedWorlds) — 바닐라 그대로
+  vanilla-worlds: []
+  # 토템이 아예 안 되는 월드(FullDisableInWorlds)
+  disabled-worlds: []
+  # 허공 구하기(protect-from-void)를 하지 않는 월드 — 던전 월드는 허공 추락을 "쓰러짐" 으로 다루고,
+  # 다른 월드로 옮기면 판에서 빠지므로 넣어 둔다
+  protect-from-void-skip-worlds:
+    - inmc_dungeon
+  # 토템 보호·쿨타임 남은 시간 보스바(사람마다 /토템 보스바 로 끔)
+  boss-bar: true
+
+# 때린 몹·플레이어의 체력 보스바(BossBar.HpBarEnabled · HpBarBlackList, 권한 inmcessentials.player.hpbar)
+hp-bar:
+  enabled: true
+  blacklist:
+    - ender_dragon
+  # 안 때리고 이 초가 지나면 내린다
+  seconds: 5
+  # 플레이어를 때렸을 때도 보인다
+  players: true
+  # 커스텀 몹(inmc-monster 의 몹 — 보스바 깃발이 있으면 자기 보스바를 띄운다 · 던전 보스 포함)은 빼기
+  skip-custom-mobs: true
