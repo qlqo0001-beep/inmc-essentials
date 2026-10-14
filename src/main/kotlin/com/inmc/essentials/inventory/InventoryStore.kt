@@ -1,11 +1,10 @@
 package com.inmc.essentials.inventory
 
 import com.inmc.essentials.Ess
+import kr.inmc.core.item.ItemCodec
 import kr.inmc.core.store.SqlDialect
 import kr.inmc.core.store.SqlSource
 import org.bukkit.Material
-import org.bukkit.NamespacedKey
-import org.bukkit.Registry
 import org.bukkit.attribute.Attribute
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
@@ -48,25 +47,14 @@ class InvData(
             )
         }
 
-        fun encode(items: Array<ItemStack?>): ByteArray =
-            ItemStack.serializeItemsAsBytes(items.map { it ?: ItemStack.empty() })
+        // 직렬화는 core [ItemCodec](2026-10-15 — inmc-worlds 의 모드별 몸이 같이 쓴다).
+        fun encode(items: Array<ItemStack?>): ByteArray = ItemCodec.encode(items)
 
-        fun decode(bytes: ByteArray?, size: Int): Array<ItemStack?> {
-            val read = if (bytes == null || bytes.isEmpty()) emptyArray() else ItemStack.deserializeItemsFromBytes(bytes)
-            return Array(size) { i -> read.getOrNull(i)?.takeIf { !it.type.isAir && !it.isEmpty } }
-        }
+        fun decode(bytes: ByteArray?, size: Int): Array<ItemStack?> = ItemCodec.decode(bytes, size)
 
-        fun encodeEffects(effects: List<PotionEffect>): String = effects.joinToString(";") { e ->
-            val key = Registry.EFFECT.getKey(e.type)?.toString() ?: return@joinToString ""
-            listOf(key, e.duration, e.amplifier, e.isAmbient, e.hasParticles(), e.hasIcon()).joinToString("|")
-        }.trim(';')
+        fun encodeEffects(effects: List<PotionEffect>): String = ItemCodec.encodeEffects(effects)
 
-        fun decodeEffects(text: String?): List<PotionEffect> =
-            text.orEmpty().split(';').filter { it.isNotBlank() }.mapNotNull { part ->
-                val f = part.split('|')
-                val type = NamespacedKey.fromString(f[0])?.let { Registry.EFFECT.get(it) } ?: return@mapNotNull null
-                runCatching { PotionEffect(type, f[1].toInt(), f[2].toInt(), f[3].toBoolean(), f[4].toBoolean(), f[5].toBoolean()) }.getOrNull()
-            }
+        fun decodeEffects(text: String?): List<PotionEffect> = ItemCodec.decodeEffects(text)
 
         /** [data] 를 사람에게 되돌린다(설정이 고른 것만). */
         fun restore(player: Player, data: InvData, s: SavedSettings) {

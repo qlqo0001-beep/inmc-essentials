@@ -2,10 +2,9 @@ package com.inmc.essentials.world
 
 import io.papermc.paper.registry.RegistryAccess
 import io.papermc.paper.registry.RegistryKey
+import kr.inmc.core.integration.PlaceNames
 import kr.inmc.core.util.VanillaNames
-import org.bukkit.Bukkit
 import org.bukkit.block.Biome
-import java.lang.reflect.Method
 
 /**
  * 생물군계 이름 — 타이틀포지 이름(`places.yml`) → 공식 한국어 이름(core [VanillaNames]) → id 순으로 보여 주고, **셋 다** 입력으로 받는다
@@ -39,31 +38,10 @@ class BiomeNames {
     /** 입력에 맞는 생물군계들. [Match.exact] 가 비면 [Match.candidates](부분 일치) 중에서 고르게 알린다. */
     fun resolve(input: String, within: Collection<Entry> = entries()): Match = match(input, within)
 
-    // --- 타이틀포지 (리플렉션 — ARCHITECTURE "리플렉션 진입점" biomeNameOf) ----------------------------------
+    // --- 타이틀포지 (core 장소 이름 창구 — 2026-10-15 전에는 biomeNameOf 리플렉션) ----------------------------------
 
-    @Volatile
-    private var cachedPlugin: Any? = null
-
-    @Volatile
-    private var cachedMethod: Method? = null
-
-    fun titleForgeName(key: String): String? {
-        val plugin = Bukkit.getPluginManager().getPlugin("InMc-TitleForge")?.takeIf { it.isEnabled } ?: return null
-        return try {
-            var method = cachedMethod
-            if (method == null || cachedPlugin !== plugin) {
-                method = plugin.javaClass.getMethod("biomeNameOf", String::class.java)
-                cachedPlugin = plugin
-                cachedMethod = method
-            }
-            (method!!.invoke(plugin, key) as? String)?.trim()?.takeIf { it.isNotEmpty() }
-        } catch (_: Throwable) {
-            // 옛 타이틀포지(진입점 없음) — 이름 없이 공식 이름으로. 다음 부름에 다시 찾는다(업데이트 뒤 /reload).
-            cachedPlugin = null
-            cachedMethod = null
-            null
-        }
-    }
+    /** 타이틀포지 이름(평문). 타이틀포지가 없거나 이름을 안 바꿨으면 null — 공식 이름으로 물러난다. */
+    fun titleForgeName(key: String): String? = PlaceNames.biome(key)?.let(PlaceNames::plain)?.takeIf { it.isNotEmpty() }
 
     data class Match(val exact: List<Entry>, val candidates: List<Entry>)
 
