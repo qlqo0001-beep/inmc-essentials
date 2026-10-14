@@ -18,7 +18,8 @@ import java.util.concurrent.ConcurrentHashMap
  * 부팅 때 읽은 낡은 사본이라 다른 서버에서 이미 받은 우편이 남아 있을 수 있다(아이템·돈 복사).
  *
  * **모드마다 따로**(2026-10-15, core [Realms] — inmc-worlds): 우편마다 칸([MailEntry.scope])이 있고, [of] 는 **그 사람의 지금 칸**의 우편만 보인다 —
- * 세기·목록·받기·한도가 모두 그 칸 안에서다. 넣을 때의 칸은 우편의 `realm`(번 모드) 또는 받는 사람의 지금 모드([scopeFor]). 묘비(열쇠)는 칸을 가리지 않는다.
+ * 세기·목록·받기·한도가 모두 그 칸 안에서다. 넣을 때의 칸은 [deposit] 의 `realm`(보낸 사람의 모드 — 아이템 편지) 또는 받는 사람의 지금 모드([scopeFor]).
+ * core `Mail.Parcel` 에는 모드 칸을 두지 않는다 — 서명을 바꾸면 옛 core 로 빌드된 플러그인 jar 가 전부 `NoSuchMethodError` 가 된다. 묘비(열쇠)는 칸을 가리지 않는다.
  * 고치기·지우기는 칸을 가리지 않는 전체 목록([full])으로 — 다른 칸의 우편을 잃지 않게.
  */
 class MailStore(private val ess: Ess) {
@@ -80,9 +81,12 @@ class MailStore(private val ess: Ess) {
      * 넣기 판단([MailRules.admit]) + 넣기. [persist] = false 면 메모리만(검증기). 같은 판단과 넣기가 한 잠금 안에서 — 두 스레드가 같은 key 를
      * 동시에 넣어도 한 통. [force] 는 편지 한도를 넘어서도(콘솔·관리자 편지).
      */
-    fun deposit(owner: UUID, parcel: Mail.Parcel, settings: MailSettings, rich: Boolean, persist: Boolean = true, force: Boolean = false): Pair<MailRules.Admit, MailEntry?> {
+    fun deposit(
+        owner: UUID, parcel: Mail.Parcel, settings: MailSettings, rich: Boolean, persist: Boolean = true, force: Boolean = false,
+        realm: String? = null,
+    ): Pair<MailRules.Admit, MailEntry?> {
         synchronized(lock) {
-            val scope = scopeFor(owner, parcel.realm)
+            val scope = scopeFor(owner, realm)
             val existing = full(owner)
             val admit = MailRules.admit(existing.filter { it.scope == scope }, parcel, settings, spentKeys(owner), force)
             if (admit !is MailRules.Admit.Accept) return admit to null
@@ -359,7 +363,7 @@ class MailStore(private val ess: Ess) {
     /** 이 사람의 지금 우편함 칸. */
     fun scopeOf(owner: UUID): String = Realms.scope(FEATURE, owner)
 
-    /** 넣을 칸 — [realm](번 모드)이 있으면 그 모드(같이 쓰기면 `""`), 없으면 받는 사람의 지금 칸. */
+    /** 넣을 칸 — [realm](모드)이 있으면 그 모드(같이 쓰기면 `""`), 없으면 받는 사람의 지금 칸. */
     fun scopeFor(owner: UUID, realm: String?): String =
         if (realm == null) scopeOf(owner) else if (Realms.isShared(FEATURE)) "" else realm
 

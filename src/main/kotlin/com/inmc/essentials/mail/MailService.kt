@@ -46,8 +46,10 @@ class MailService(private val ess: Ess, private val feature: MailFeature) : Mail
     }
 
     /** 넣고 알린다. 보상 한도로 거절하면 콘솔에 경고(사용자 결정 — 조용히 지우지 않는다). [force] = 편지 한도를 넘어서도, [persist] = false 면 메모리만(검증기). */
-    fun depositEntry(playerId: UUID, parcel: Mail.Parcel, rich: Boolean, force: Boolean = false, persist: Boolean = true): Pair<MailRules.Admit, MailEntry?> {
-        val result = store.deposit(playerId, parcel, settings, rich, persist, force)
+    fun depositEntry(
+        playerId: UUID, parcel: Mail.Parcel, rich: Boolean, force: Boolean = false, persist: Boolean = true, realm: String? = null,
+    ): Pair<MailRules.Admit, MailEntry?> {
+        val result = store.deposit(playerId, parcel, settings, rich, persist, force, realm)
         when (val admit = result.first) {
             MailRules.Admit.RewardLimit -> if (limitWarnings.shouldWarn("$playerId/${parcel.origin}/${parcel.key ?: parcel.source}", System.currentTimeMillis())) {
                 ess.logger.warning(
@@ -184,11 +186,11 @@ class MailService(private val ess: Ess, private val feature: MailFeature) : Mail
             source = ess.messages.raw("mail-source-letter").replace("{플레이어}", name).replace("{player}", name),
             senderId = player?.uniqueId, senderName = name, text = text, items = items,
             at = System.currentTimeMillis(), expiresAt = expiresAt, key = key,
-            // 아이템을 붙인 편지는 **보낸 사람의 모드** 우편함으로 — 받는 사람이 다른 모드에 있어도 물건이 모드를 넘지 않게(core `Realms`, 2026-10-15).
-            // 글만 있는 편지는 받는 사람의 지금 모드로(넘을 물건이 없다).
-            realm = if (items.isNotEmpty()) player?.let { kr.inmc.core.integration.Realms.of(it) } else null,
         )
-        val (admit, entry) = depositEntry(to, parcel, rich, force, persist)
+        // 아이템을 붙인 편지는 **보낸 사람의 모드** 우편함으로 — 받는 사람이 다른 모드에 있어도 물건이 모드를 넘지 않게(core `Realms`, 2026-10-15).
+        // 글만 있는 편지는 받는 사람의 지금 모드로(넘을 물건이 없다).
+        val realm = if (items.isNotEmpty()) player?.let { kr.inmc.core.integration.Realms.of(it) } else null
+        val (admit, entry) = depositEntry(to, parcel, rich, force, persist, realm)
         return when (admit) {
             is MailRules.Admit.Accept -> if (entry != null && entry.parcel.items.size == items.size) Sent.OK else Sent.FAILED
             MailRules.Admit.Duplicate -> if (items.isEmpty()) Sent.OK else Sent.FAILED
