@@ -47,6 +47,9 @@ class TpaFlow(private val ess: Ess, private val feature: TeleportFeature, privat
         if (restricted(target.uniqueId)) return fail("teleport-tpa-restricted-target", Ph.of().target(target.name))
         // 던전 같은 제외 월드 — 안에서 부르거나 안으로 가지 못하게(요청한 쪽·받는 쪽 어느 쪽이 그 월드에 있어도).
         excludedWorld(sender.world, target.world)?.let { return fail("teleport-tpa-excluded-world", Ph.of().world(it)) }
+        // 다른 모드 — 수락받아도 모드 공급처(inmc-worlds)가 막는다. 지금 알려 준다(core `Realms`, 2026-10-15 — 관리자는 넘는다).
+        val (mover, to) = if (here) target to sender.location else sender to target.location
+        if (!kr.inmc.core.integration.Realms.canTravel(mover, to)) return fail("teleport-tpa-other-mode", Ph.of().target(target.name))
         val bypass = sender.hasPermission(TeleportFeature.TOGGLE_BYPASS)
         if (service.refuses(target.uniqueId, sender.uniqueId, bypass)) {
             return fail("teleport-tpa-not-accepting", Ph.of().target(target.name))

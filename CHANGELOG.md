@@ -2,6 +2,16 @@
 
 ---
 
+## 미배포 — 모드마다 따로: 우편함 · 저장 인벤 · 이동 요청 · 워프(2026-10-15, inmc-worlds 4단계)
+
+- **우편함**(기능 `essentials.mail`, inmc-worlds 의 기능 토글에 뜬다): 우편마다 칸(`ess_mail.scope` 열 — 켤 때 없으면 덧붙인다). 세기·목록·받기·한도는
+  그 사람의 **지금 칸**만. 넣을 칸 = 우편의 받을 모드(core `Mail.Parcel.realm`) 또는 받는 사람의 지금 모드. **아이템을 붙인 편지는 보낸 사람의 모드로**
+  (받는 사람이 다른 모드에 있어도 물건이 넘어가지 않게), 글만 있는 편지는 받는 사람의 모드로. 묘비(열쇠)는 칸을 가리지 않는다.
+- **저장 인벤**(`/인벤저장`·죽을 때 저장·불러오기 전 백업): 저장할 때의 가방 칸(`ess_saved_inventories.scope`)을 적고, 다른 칸의 몸에는 불러오지 않는다
+  (`inventory-load-other-mode`) — 접속하지 않은 사람은 마지막 모드와 견준다. 모드가 없던 때의 저장은 어디에나.
+- **이동 요청**: 다른 모드에 있는 사람에게는 요청부터 거절(`teleport-tpa-other-mode` — 수락받아도 inmc-worlds 가 막으므로 지금 알린다, 관리자는 넘는다).
+- **워프**: 다른 모드의 워프는 목록에서 빼고, 부르면 `warps-other-mode`(관리자는 다 보이고 넘는다).
+
 ## 미배포 — Multiverse 대신 inmc-worlds 모드(2026-10-15)
 
 - **오프라인 가방 편집**: Multiverse-Inventories 그룹(리플렉션 `MvInvGroups`)을 지우고 `InvGroups` — core `Realms.scope("worlds.inventory", player)` 로 가방 칸을 가른다.

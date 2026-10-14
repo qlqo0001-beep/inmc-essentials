@@ -101,6 +101,7 @@ class TeleportFeature(ess: Ess) : Feature(ess), CmiImportable {
         "teleport-tpa-restricted-self" to "<red>지금은 이동 요청을 쓸 수 없습니다.</red>",
         "teleport-tpa-restricted-target" to "<red>{대상}님은 지금 이동 요청을 받을 수 없습니다.</red>",
         "teleport-tpa-excluded-world" to "<red>'{월드}' 에서는 이동 요청을 쓸 수 없습니다.</red>",
+        "teleport-tpa-other-mode" to "<red>{대상}님은 다른 모드에 있습니다 — 모드가 다르면 이동 요청을 쓸 수 없습니다.</red>",
         "teleport-tpa-failed" to "<red>{플레이어}님의 이동이 이루어지지 않았습니다.</red>",
         "teleport-tpa-not-accepting" to "<red>{대상}님은 이동 요청을 받지 않습니다.</red>",
         "teleport-tpa-deny-blocked" to "<red>{대상}님이 요청을 거절해 {시간}초 동안 다시 요청할 수 없습니다.</red>",

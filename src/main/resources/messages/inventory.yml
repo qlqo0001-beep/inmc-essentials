@@ -44,6 +44,7 @@ inventory-list-header: '<gold>{플레이어}님의 저장 인벤 {개수}개</go
 inventory-list-entry: '<gray>{순위}.</gray> <white>{시간}</white> <gray>{사유} · {값} · {개수}칸 · #{아이디}</gray> <click:run_command:''/인벤목록 {플레이어} #{아이디}''><aqua>[보기]</aqua></click> <click:run_command:''/인벤불러오기 {플레이어} #{아이디}''><green>[불러오기]</green></click> <click:suggest_command:''/인벤삭제 {플레이어} #{아이디}''><red>[지우기]</red></click>'
 inventory-bad-number: '<red>번호가 이상합니다: {값}</red> <gray>(1 = 가장 새것 · last · #id · all)</gray>'
 inventory-not-found: '<red>{플레이어}님의 저장 인벤 ''{값}'' 이(가) 없습니다.</red>'
+inventory-load-other-mode: '<red>이 저장은 다른 모드(''{값}'')의 가방입니다 — {플레이어}님이 그 모드에 있을 때 불러오세요.</red>'
 inventory-load-usage: '<yellow>/인벤불러오기 [주인] [번호|last] [받을사람]</yellow> <gray>— 받는 사람의 지금 가방은 먼저 저장됩니다</gray>'
 inventory-load-offline: '<red>{플레이어}님이 접속 중이 아닙니다 — 접속하지 않은 사람에게 불러오려면 inmcessentials.inventory.inv.offline 권한이 있어야 하고 아이템만 되돌립니다(settings saved.restore.items).</red>'
 inventory-loaded: '<green>{플레이어}님에게 {값}님의 저장 인벤({시간})을 되돌렸습니다.</green>'

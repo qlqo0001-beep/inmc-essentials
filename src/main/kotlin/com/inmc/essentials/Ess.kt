@@ -193,5 +193,8 @@ class Ess(override val plugin: JavaPlugin) : RewardHost {
 
         /** PDC 네임스페이스 — 상수(플러그인 이름을 쓰지 않는다). `NamespacedKey(NAMESPACE, "…")`. */
         const val NAMESPACE = "inmcess"
+
+        /** core `Realms` 기능 목록(inmc-worlds 의 기능 토글 화면)의 묶음 이름 — 기능마다 `Realms.register`/`unregisterFeature`. */
+        const val REALM_GROUP = "에센셜"
     }
 }

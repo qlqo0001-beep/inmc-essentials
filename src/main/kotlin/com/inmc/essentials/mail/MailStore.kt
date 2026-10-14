@@ -2,6 +2,7 @@ package com.inmc.essentials.mail
 
 import com.inmc.essentials.Ess
 import kr.inmc.core.integration.Mail
+import kr.inmc.core.integration.Realms
 import kr.inmc.core.store.SqlDialect
 import kr.inmc.core.store.SqlSource
 import java.sql.Types
@@ -15,6 +16,10 @@ import java.util.concurrent.ConcurrentHashMap
  * 공용 DB(mysql)를 여러 서버가 쓰면 다른 서버가 넣은 우편은 그 사람이 **이 서버에 들어오기 직전**(비동기 접속 사건)에 다시 읽는다([reload]).
  * 다시 읽기에 실패하면 그 사람을 "맞추지 못함"([isSynced] = false)으로 두고, 다음 다시 읽기가 될 때까지 받기를 거절한다 — 이 서버의 메모리는
  * 부팅 때 읽은 낡은 사본이라 다른 서버에서 이미 받은 우편이 남아 있을 수 있다(아이템·돈 복사).
+ *
+ * **모드마다 따로**(2026-10-15, core [Realms] — inmc-worlds): 우편마다 칸([MailEntry.scope])이 있고, [of] 는 **그 사람의 지금 칸**의 우편만 보인다 —
+ * 세기·목록·받기·한도가 모두 그 칸 안에서다. 넣을 때의 칸은 우편의 `realm`(번 모드) 또는 받는 사람의 지금 모드([scopeFor]). 묘비(열쇠)는 칸을 가리지 않는다.
+ * 고치기·지우기는 칸을 가리지 않는 전체 목록([full])으로 — 다른 칸의 우편을 잃지 않게.
  */
 class MailStore(private val ess: Ess) {
 
@@ -46,7 +51,11 @@ class MailStore(private val ess: Ess) {
         unsynced -= owner
     }
 
-    fun of(owner: UUID): List<MailEntry> = byOwner[owner].orEmpty()
+    /** 이 사람의 **지금 칸**의 우편(오래된 것부터). */
+    fun of(owner: UUID): List<MailEntry> = scopeOf(owner).let { scope -> full(owner).filter { it.scope == scope } }
+
+    /** 칸을 가리지 않는 전부. */
+    private fun full(owner: UUID): List<MailEntry> = byOwner[owner].orEmpty()
 
     fun find(owner: UUID, id: String): MailEntry? = of(owner).firstOrNull { it.id == id }
 
@@ -73,10 +82,11 @@ class MailStore(private val ess: Ess) {
      */
     fun deposit(owner: UUID, parcel: Mail.Parcel, settings: MailSettings, rich: Boolean, persist: Boolean = true, force: Boolean = false): Pair<MailRules.Admit, MailEntry?> {
         synchronized(lock) {
-            val existing = of(owner)
-            val admit = MailRules.admit(existing, parcel, settings, spentKeys(owner), force)
+            val scope = scopeFor(owner, parcel.realm)
+            val existing = full(owner)
+            val admit = MailRules.admit(existing.filter { it.scope == scope }, parcel, settings, spentKeys(owner), force)
             if (admit !is MailRules.Admit.Accept) return admit to null
-            val entry = MailEntry(UUID.randomUUID().toString(), owner, parcel.copy(expiresAt = MailRules.expiryOf(parcel, settings)), null, rich)
+            val entry = MailEntry(UUID.randomUUID().toString(), owner, parcel.copy(expiresAt = MailRules.expiryOf(parcel, settings)), null, rich, scope)
             val dropIds = admit.dropOldest.toSet()
             val dropped = existing.filter { it.id in dropIds }
             byOwner[owner] = existing.filter { it.id !in dropIds } + entry
@@ -97,7 +107,7 @@ class MailStore(private val ess: Ess) {
     /** 바꾼다(받고 남은 것 · 읽음). DB 쓰기를 잠금 안에서 줄 세운다([reload] 의 순서 보장). */
     fun update(entry: MailEntry, persist: Boolean = true) {
         synchronized(lock) {
-            val list = of(entry.owner)
+            val list = full(entry.owner)
             if (list.none { it.id == entry.id }) return
             byOwner[entry.owner] = list.map { if (it.id == entry.id) entry else it }
             bump(entry.owner)
@@ -113,7 +123,7 @@ class MailStore(private val ess: Ess) {
         if (ids.isEmpty()) return emptyList()
         val wanted = ids.toSet()
         synchronized(lock) {
-            val list = of(owner)
+            val list = full(owner)
             val removed = list.filter { it.id in wanted }
             if (removed.isEmpty()) return emptyList()
             val left = list.filter { it.id !in wanted }
@@ -152,7 +162,7 @@ class MailStore(private val ess: Ess) {
     fun purgeExpired(now: Long, persist: Boolean = true): Int {
         var count = 0
         for (owner in owners()) {
-            val ids = of(owner).filter { MailRules.expired(it, now) }.map { it.id }
+            val ids = full(owner).filter { MailRules.expired(it, now) }.map { it.id }
             count += remove(owner, ids, persist).size
         }
         return count
@@ -194,6 +204,8 @@ class MailStore(private val ess: Ess) {
                     "source $text NOT NULL, sender_id $id, sender_name $short, body $text, payload $text, at $big NOT NULL, expires_at $big, " +
                     "mail_key $key, read_at $big, UNIQUE (owner, origin, mail_key))",
             )
+            // 2026-10-15 모드 — 우편함 칸(이미 만든 표에는 열을 덧붙인다 — 있으면 실패를 무시).
+            runCatching { st.execute("ALTER TABLE $TABLE ADD COLUMN scope $short NOT NULL DEFAULT ''") }
             st.execute(
                 "CREATE TABLE IF NOT EXISTS $KEYS (owner $id NOT NULL, origin $short NOT NULL, mail_key $key NOT NULL, at $big NOT NULL, " +
                     "PRIMARY KEY (owner, origin, mail_key))",
@@ -241,7 +253,7 @@ class MailStore(private val ess: Ess) {
 
     private fun read(source: SqlSource, only: UUID?): List<MailEntry> =
         source.connection().prepareStatement(
-            "SELECT id, owner, kind, origin, source, sender_id, sender_name, body, payload, at, expires_at, mail_key, read_at FROM $TABLE" +
+            "SELECT id, owner, kind, origin, source, sender_id, sender_name, body, payload, at, expires_at, mail_key, read_at, scope FROM $TABLE" +
                 if (only != null) " WHERE owner = ?" else "",
         ).use { ps ->
             if (only != null) ps.setString(1, only.toString())
@@ -265,7 +277,7 @@ class MailStore(private val ess: Ess) {
                             text = rs.getString(8), items = payload.items, money = payload.money, moneyBy = payload.moneyBy, commands = payload.commands,
                             at = rs.getLong(10), expiresAt = expires, key = rs.getString(12),
                         )
-                        add(MailEntry(id, owner, parcel, read, payload.rich))
+                        add(MailEntry(id, owner, parcel, read, payload.rich, rs.getString(14).orEmpty()))
                     }
                 }
             }
@@ -274,8 +286,8 @@ class MailStore(private val ess: Ess) {
     private fun insert(source: SqlSource, e: MailEntry) {
         val p = e.parcel
         source.connection().prepareStatement(
-            "INSERT INTO $TABLE (id, owner, kind, origin, source, sender_id, sender_name, body, payload, at, expires_at, mail_key, read_at) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO $TABLE (id, owner, kind, origin, source, sender_id, sender_name, body, payload, at, expires_at, mail_key, read_at, scope) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         ).use { ps ->
             ps.setString(1, e.id)
             ps.setString(2, e.owner.toString())
@@ -290,6 +302,7 @@ class MailStore(private val ess: Ess) {
             if (p.expiresAt != null) ps.setLong(11, p.expiresAt!!) else ps.setNull(11, Types.BIGINT)
             ps.setString(12, p.key?.take(191))
             if (e.readAt != null) ps.setLong(13, e.readAt) else ps.setNull(13, Types.BIGINT)
+            ps.setString(14, e.scope.take(64))
             ps.executeUpdate()
         }
     }
@@ -343,7 +356,17 @@ class MailStore(private val ess: Ess) {
         }
     }
 
+    /** 이 사람의 지금 우편함 칸. */
+    fun scopeOf(owner: UUID): String = Realms.scope(FEATURE, owner)
+
+    /** 넣을 칸 — [realm](번 모드)이 있으면 그 모드(같이 쓰기면 `""`), 없으면 받는 사람의 지금 칸. */
+    fun scopeFor(owner: UUID, realm: String?): String =
+        if (realm == null) scopeOf(owner) else if (Realms.isShared(FEATURE)) "" else realm
+
     companion object {
+        /** core `Realms` 기능 열쇠 — 우편함을 모드마다 따로 둘지. */
+        const val FEATURE = "essentials.mail"
+
         const val TABLE = "ess_mail"
         const val KEYS = "ess_mail_keys"
 

@@ -9,7 +9,11 @@ import java.util.UUID
  * 우편함 한 칸. [parcel] 은 core 의 불변 우편, [readAt] 은 편지를 연 때(보상은 쓰지 않는다), [rich] 는 편지 글이 MiniMessage 인가
  * (관리자가 색 권한으로 보낸 편지 · CMI 에서 가져온 편지) — 아니면 글자 그대로 보인다.
  */
-data class MailEntry(val id: String, val owner: UUID, val parcel: Mail.Parcel, val readAt: Long? = null, val rich: Boolean = false) {
+data class MailEntry(
+    val id: String, val owner: UUID, val parcel: Mail.Parcel, val readAt: Long? = null, val rich: Boolean = false,
+    /** 우편함 칸 — 모드마다 따로면 모드 id, 같이면 `""`(core `Realms`, 2026-10-15 — [MailStore.scopeOf]). */
+    val scope: String = "",
+) {
 
     val isLetter: Boolean get() = parcel.kind == Mail.Kind.LETTER
 

@@ -191,6 +191,7 @@ class WarpsFeature(ess: Ess) : Feature(ess), CmiImportable {
             "warps-sent" to "<green>{대상}님을 워프 <white>{워프}</white>(으)로 보냈습니다.</green>",
             "warps-teleport-failed" to "<red>워프 {워프}(으)로 이동하지 못했습니다.</red>",
             "warps-world-missing" to "<red>워프 {워프} 의 월드({월드})가 없습니다.</red>",
+            "warps-other-mode" to "<red>워프 {워프} 은(는) 다른 모드에 있습니다.</red>",
             "warps-console-target" to "<red>콘솔에서는 보낼 사람을 적으세요: /워프 [이름] [플레이어]</red>",
             "warps-set-usage" to "<yellow>/워프설정 [이름] [true/false 권한] [손|머리|재질] [칸] [그룹:이름] [덮어쓰기]</yellow>",
             "warps-edit-usage" to "<yellow>/워프편집 [이름]</yellow> <gray>— 편집 화면</gray> · <yellow>/워프편집 [이름] [새 이름]</yellow> <gray>— 이름 바꾸기</gray>",

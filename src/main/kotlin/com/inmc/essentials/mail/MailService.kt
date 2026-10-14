@@ -184,6 +184,9 @@ class MailService(private val ess: Ess, private val feature: MailFeature) : Mail
             source = ess.messages.raw("mail-source-letter").replace("{플레이어}", name).replace("{player}", name),
             senderId = player?.uniqueId, senderName = name, text = text, items = items,
             at = System.currentTimeMillis(), expiresAt = expiresAt, key = key,
+            // 아이템을 붙인 편지는 **보낸 사람의 모드** 우편함으로 — 받는 사람이 다른 모드에 있어도 물건이 모드를 넘지 않게(core `Realms`, 2026-10-15).
+            // 글만 있는 편지는 받는 사람의 지금 모드로(넘을 물건이 없다).
+            realm = if (items.isNotEmpty()) player?.let { kr.inmc.core.integration.Realms.of(it) } else null,
         )
         val (admit, entry) = depositEntry(to, parcel, rich, force, persist)
         return when (admit) {

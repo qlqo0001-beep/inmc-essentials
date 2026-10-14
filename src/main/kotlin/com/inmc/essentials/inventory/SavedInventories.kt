@@ -128,10 +128,13 @@ class SavedInventories(private val ess: Ess, private val feature: InventoryFeatu
 
     /** 지금 가방을 DB 에 넣는다(바이트는 메인에서, 쓰기는 DB 스레드). 끝나면 메인에서 [done]. */
     private fun write(player: Player, by: String, reason: String, done: ((Boolean) -> Unit)? = null) =
-        write(player.uniqueId, player.name, by, reason, InvData.capture(player, s.blacklist), -1L, done)
+        write(player.uniqueId, player.name, by, reason, InvData.capture(player, s.blacklist), -1L, InvGroups.of(player), done)
 
-    /** [data] 를 DB 에. [protect] 의 저장은 이번 정리(keep-per-player)에서 지우지 않는다. */
-    private fun write(id: java.util.UUID, name: String, by: String, reason: String, data: InvData, protect: Long, done: ((Boolean) -> Unit)?) {
+    /**
+     * [data] 를 DB 에. [protect] 의 저장은 이번 정리(keep-per-player)에서 지우지 않는다. [scope] = 그 몸의 가방 칸(모드 — [InvGroups]) —
+     * 불러올 때 다른 칸의 몸이면 거절한다(모드 사이로 물건이 넘어가지 않게, 2026-10-15).
+     */
+    private fun write(id: java.util.UUID, name: String, by: String, reason: String, data: InvData, protect: Long, scope: String? = null, done: ((Boolean) -> Unit)?) {
         val items = InvData.encode(data.items)
         val ender = InvData.encode(data.ender)
         val effects = InvData.encodeEffects(data.effects)
@@ -139,7 +142,7 @@ class SavedInventories(private val ess: Ess, private val feature: InventoryFeatu
         val keep = s.keep
         ess.db.run("인벤 저장") {
             val ok = runCatching {
-                store.insertSaved(id, name, System.currentTimeMillis(), by, reason, count, items, ender, data.health, data.level, data.exp, data.food, data.saturation, effects, keep, protect)
+                store.insertSaved(id, name, System.currentTimeMillis(), by, reason, count, items, ender, data.health, data.level, data.exp, data.food, data.saturation, effects, keep, protect, scope)
             }.onFailure { ess.logger.warning("인벤 저장 실패($name): $it") }.isSuccess
             if (done != null) Bukkit.getScheduler().runTask(ess.plugin, Runnable { done(ok) })
         }
@@ -263,6 +266,7 @@ class SavedInventories(private val ess: Ess, private val feature: InventoryFeatu
             Bukkit.getScheduler().runTask(ess.plugin, Runnable {
                 if (row == null) return@Runnable ess.messages.send(sender, "inventory-not-found", Ph.of().player(owner.name).value(number))
                 if (!receiver.isOnline) return@Runnable ess.messages.send(sender, "player-not-found", Ph.of().value(receiver.name))
+                if (!InvGroups.matches(row.scope, InvGroups.of(receiver))) return@Runnable ess.messages.send(sender, "inventory-load-other-mode", Ph.of().player(receiver.name).value(row.scope.orEmpty()))
                 // 같은 틱에: 지금 가방을 그대로(금지 아이템도) 잡고 → 덮고 → 잡은 것을 백업으로 쓴다. 그 사이에 들어온 것이 어디에도 없게 되는 틈이 없다.
                 val backup = if (s.backupBeforeLoad) InvData.capture(receiver) else null
                 val data = InvData(
@@ -276,7 +280,7 @@ class SavedInventories(private val ess: Ess, private val feature: InventoryFeatu
                 if (receiver != sender) ess.messages.send(receiver, "inventory-loaded-target", Ph.of().player(sender.name))
                 if (backup != null && !backup.isEmpty()) {
                     val name = receiver.name
-                    write(receiver.uniqueId, name, sender.name, InventoryStore.REASON_BACKUP, backup, row.head.id) { ok ->
+                    write(receiver.uniqueId, name, sender.name, InventoryStore.REASON_BACKUP, backup, row.head.id, scope = InvGroups.of(receiver)) { ok ->
                         if (!ok) ess.messages.send(sender, "inventory-backup-failed", Ph.of().player(name).value(dumpBackup(name, backup)))
                     }
                 }
@@ -293,6 +297,9 @@ class SavedInventories(private val ess: Ess, private val feature: InventoryFeatu
             val row = resolve(owner, ref)
             Bukkit.getScheduler().runTask(ess.plugin, Runnable {
                 if (row == null) return@Runnable ess.messages.send(sender, "inventory-not-found", Ph.of().player(owner.name).value(number))
+                // 접속하지 않은 사람 — 그 사람의 마지막 모드의 가방 칸과 견준다(대기 편집은 그 칸의 몸에 얹힌다).
+                val receiverScope = if (kr.inmc.core.integration.Realms.available) kr.inmc.core.integration.Realms.scope(InvGroups.INVENTORY_KEY, receiver.id) else null
+                if (!InvGroups.matches(row.scope, receiverScope)) return@Runnable ess.messages.send(sender, "inventory-load-other-mode", Ph.of().player(receiver.name).value(row.scope.orEmpty()))
                 val contents = mapOf(
                     PendingKind.INVENTORY to InvData.decode(row.items, InvData.INVENTORY_SIZE),
                     PendingKind.ENDER to InvData.decode(row.ender, InvData.ENDER_SIZE),
@@ -306,7 +313,7 @@ class SavedInventories(private val ess: Ess, private val feature: InventoryFeatu
                         20.0, 0, 0f, 20, 5f, emptyList(),
                     )
                     if (backup.isEmpty()) return@stage
-                    write(receiver.id, receiver.name, sender.name, InventoryStore.REASON_BACKUP, backup, row.head.id) { ok ->
+                    write(receiver.id, receiver.name, sender.name, InventoryStore.REASON_BACKUP, backup, row.head.id, scope = receiverScope) { ok ->
                         if (!ok) ess.messages.send(sender, "inventory-backup-failed", Ph.of().player(receiver.name).value(dumpBackup(receiver.name, backup)))
                     }
                 }

@@ -84,11 +84,16 @@ class MailFeature(ess: Ess) : Feature(ess), CmiImportable {
         ess.ticks.add("mail-묘비", 3600) { now -> store.pruneSpent(now) }
         Mail.register(service)
         registered = service
+        kr.inmc.core.integration.Realms.register(kr.inmc.core.integration.Realms.Feature(
+            MailStore.FEATURE, Ess.REALM_GROUP, "우편함", org.bukkit.Material.CHEST,
+            listOf("보상·편지 우편함 — 편지에 붙인 아이템은 보낸 사람의 모드로"),
+        ))
     }
 
     override fun disable() {
         registered?.let { Mail.unregister(it) }
         registered = null
+        kr.inmc.core.integration.Realms.unregisterFeature(MailStore.FEATURE)
     }
 
     // --- CMI 가져오기 ------------------------------------------------------------------------------

@@ -43,7 +43,14 @@ class WarpService(private val ess: Ess, private val feature: WarpsFeature, val s
     fun ownedBy(id: UUID): Int = store.all().count { it.creator == id }
 
     fun visible(sender: CommandSender, group: String? = null): List<Warp> =
-        store.all().filter { canSee(sender, it) && WarpRules.inGroup(it, group) }.sortedBy { it.key }
+        store.all().filter { canSee(sender, it) && WarpRules.inGroup(it, group) && sameMode(sender, it) }.sortedBy { it.key }
+
+    /** 다른 모드의 워프는 목록에서 뺀다(관리자는 넘을 수 있어 다 보인다 — core `Realms`, 2026-10-15). 월드가 없으면 남긴다(원래 그 메시지가 나온다). */
+    private fun sameMode(sender: CommandSender, warp: Warp): Boolean {
+        val player = sender as? Player ?: return true
+        val at = warp.location() ?: return true
+        return kr.inmc.core.integration.Realms.canTravel(player, at)
+    }
 
     // --- 아이콘 --------------------------------------------------------------------------------
 
@@ -113,6 +120,7 @@ class WarpService(private val ess: Ess, private val feature: WarpsFeature, val s
         if (spots.isEmpty()) return ess.messages.send(viewer, "warps-world-missing", ph.world(warp.world))
         val random = ThreadLocalRandom.current()
         val to: Location = spots[random.nextInt(spots.size)].clone()
+        if (!kr.inmc.core.integration.Realms.canTravel(who, to)) return ess.messages.send(viewer, "warps-other-mode", ph)
         if (warp.randomYaw) to.yaw = random.nextFloat() * 360f - 180f
         ess.teleporter.teleport(who, to, TeleportKind.WARP).whenComplete { ok, error ->
             sync(who) {

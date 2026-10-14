@@ -153,6 +153,8 @@ class InventoryStore(private val ess: Ess) {
                     "saved_by $text NOT NULL, reason $text NOT NULL, item_count $int NOT NULL, items $blob, ender $blob, hp $real NOT NULL, " +
                     "xp_level $int NOT NULL, xp_progress $real NOT NULL, food $int NOT NULL, saturation $real NOT NULL, effects $long)",
             )
+            // 2026-10-15 모드 — 저장할 때의 가방 칸(core `Realms`). 다른 칸의 몸에는 불러오지 않는다(모드 사이로 물건이 넘어가지 않게).
+            runCatching { st.execute("ALTER TABLE $SAVED ADD COLUMN scope $text") }
             runCatching { st.execute("CREATE INDEX ${if (sqlite) "IF NOT EXISTS " else ""}ess_saved_inventories_owner ON $SAVED (owner, created)") }
             // 2026-10-10 오프라인 편집 — 나갈 때 모습에 지문·월드·MV 그룹을 더한다(이미 만든 표에는 열을 덧붙인다 — 있으면 실패를 무시).
             for (column in listOf("items_hash $text", "ender_hash $text", "world $text", "mv_group $long")) {
@@ -279,12 +281,12 @@ class InventoryStore(private val ess: Ess) {
     fun insertSaved(
         owner: UUID, ownerName: String, created: Long, savedBy: String, reason: String, itemCount: Int,
         items: ByteArray, ender: ByteArray, hp: Double, level: Int, exp: Float, food: Int, saturation: Float, effects: String, keep: Int,
-        protect: Long = -1L,
+        protect: Long = -1L, scope: String? = null,
     ): Long {
         val conn = ess.db.sql.connection()
         val id = conn.prepareStatement(
-            "INSERT INTO $SAVED (owner, owner_name, created, saved_by, reason, item_count, items, ender, hp, xp_level, xp_progress, food, saturation, effects) " +
-                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO $SAVED (owner, owner_name, created, saved_by, reason, item_count, items, ender, hp, xp_level, xp_progress, food, saturation, effects, scope) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
             Statement.RETURN_GENERATED_KEYS,
         ).use { ps ->
             ps.setString(1, owner.toString())
@@ -301,6 +303,7 @@ class InventoryStore(private val ess: Ess) {
             ps.setInt(12, food)
             ps.setDouble(13, saturation.toDouble())
             ps.setString(14, effects)
+            ps.setString(15, scope)
             ps.executeUpdate()
             ps.generatedKeys.use { rs -> if (rs.next()) rs.getLong(1) else -1L }
         }
@@ -324,11 +327,13 @@ class InventoryStore(private val ess: Ess) {
     class SavedRow(
         val head: SavedHead, val items: ByteArray?, val ender: ByteArray?, val hp: Double, val level: Int, val exp: Float,
         val food: Int, val saturation: Float, val effects: String?,
+        /** 저장할 때의 가방 칸(모드) — 모드가 없던 때의 저장은 null(어디에나 불러온다). */
+        val scope: String? = null,
     )
 
     fun loadSaved(id: Long): SavedRow? =
         ess.db.sql.connection().prepareStatement(
-            "SELECT owner, owner_name, created, saved_by, reason, item_count, items, ender, hp, xp_level, xp_progress, food, saturation, effects FROM $SAVED WHERE id = ?",
+            "SELECT owner, owner_name, created, saved_by, reason, item_count, items, ender, hp, xp_level, xp_progress, food, saturation, effects, scope FROM $SAVED WHERE id = ?",
         ).use { ps ->
             ps.setLong(1, id)
             ps.executeQuery().use { rs ->
@@ -337,7 +342,7 @@ class InventoryStore(private val ess: Ess) {
                 SavedRow(
                     SavedHead(id, owner, rs.getString(2), rs.getLong(3), rs.getString(4), rs.getString(5), rs.getInt(6)),
                     rs.getBytes(7), rs.getBytes(8), rs.getDouble(9), rs.getInt(10), rs.getDouble(11).toFloat(), rs.getInt(12),
-                    rs.getDouble(13).toFloat(), rs.getString(14),
+                    rs.getDouble(13).toFloat(), rs.getString(14), rs.getString(15),
                 )
             }
         }
