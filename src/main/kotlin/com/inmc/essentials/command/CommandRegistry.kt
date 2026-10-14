@@ -74,7 +74,7 @@ class CommandRegistry(private val ess: Ess) {
     fun all(): List<Entry> = entries.toList()
 
     /** 이미 쓰인 이름(메인·별칭, 이 플러그인 안). */
-    fun names(): Set<String> = entries.flatMapTo(HashSet()) { listOf(it.node.literal) + it.aliases } + AdminCommand.NAMES
+    fun names(): Set<String> = entries.flatMapTo(HashSet()) { listOf(it.node.literal) + it.aliases } + AdminCommand.NAMES + HelpCommand.NAMES
 
     /** `onEnable` 에서 한 번. 사건이 올 때마다 관리 명령을 새로 짓고 모은 것 전부를 넣는다. */
     fun hook() {
@@ -83,6 +83,7 @@ class CommandRegistry(private val ess: Ess) {
             val registrar = event.registrar()
             val admin = AdminCommand(ess).build(adminChildren.map { it.node })
             registrar.register(admin, "inmc-essentials 관리", AdminCommand.ALIASES)
+            registrar.register(HelpCommand(ess).build(), "inmc-essentials 명령어 도움말", HelpCommand.ALIASES)
             for (entry in entries) {
                 try {
                     registrar.register(entry.node, entry.description, entry.aliases)

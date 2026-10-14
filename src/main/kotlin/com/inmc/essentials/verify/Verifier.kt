@@ -55,7 +55,7 @@ class Verifier(private val ess: Ess) {
         Check("켜다 실패한 기능이 없다") { _ -> if (ess.failed.isEmpty()) null else "실패: " + ess.failed.joinToString(", ") },
         Check("명령이 서버에 올라가 있다") { _ ->
             val known = Bukkit.getCommandMap().knownCommands.keys
-            val missing = (ess.commands.all().map { it.node.literal } + com.inmc.essentials.command.AdminCommand.NAME).filter { it !in known }
+            val missing = (ess.commands.all().map { it.node.literal } + com.inmc.essentials.command.AdminCommand.NAME + com.inmc.essentials.command.HelpCommand.NAME).filter { it !in known }
             if (missing.isEmpty()) null else "없음: " + missing.joinToString(", ") { "/$it" } + " — 다른 플러그인이 같은 이름을 덮었거나 등록 사건 뒤에 들어왔습니다"
         },
     )

@@ -19,7 +19,11 @@ class AdminCommand(private val ess: Ess) {
 
     fun build(children: List<LiteralCommandNode<CommandSourceStack>>): LiteralCommandNode<CommandSourceStack> {
         val root = Commands.literal(NAME).requires { it.sender.hasPermission(Ess.ADMIN) }
-            .executes { ctx -> ess.messages.send(ctx.source.sender, "help-admin"); 1 }
+            .executes { ctx ->
+                ess.messages.send(ctx.source.sender, "help-admin")
+                ess.messages.send(ctx.source.sender, "help-admin-players")
+                1
+            }
             .then(Commands.literal("리로드").executes { ctx ->
                 val sender = ctx.source.sender
                 (ess.plugin as EssentialsPlugin).reload(sender)

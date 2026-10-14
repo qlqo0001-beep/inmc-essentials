@@ -320,7 +320,7 @@ class ServerFeature(ess: Ess) : Feature(ess), CmiImportable {
             )
             .then(Commands.literal("값").then(Commands.argument("글", StringArgumentType.greedyString()).executes { ctx ->
                 val sender = ctx.source.sender
-                if (papiReady(sender)) previewValue(sender, sender as? Player, str(ctx, "글"))
+                if (papiReady(sender)) previewValue(sender, sender as? Player, str(ctx, "글"), other = false)
                 1
             }))
             .then(Commands.literal("보기").requires(perm(PLACEHOLDERS_OTHERS)).then(ess.args.player("대상").then(Commands.argument("글", StringArgumentType.greedyString()).executes { ctx ->
@@ -328,7 +328,7 @@ class ServerFeature(ess: Ess) : Feature(ess), CmiImportable {
                 val name = str(ctx, "대상")
                 val target = ess.args.offline(sender, name)
                 if (target == null) ess.messages.send(sender, "user-not-found", Ph.of().value(name))
-                else if (papiReady(sender)) previewValue(sender, Bukkit.getOfflinePlayer(target.id), str(ctx, "글"))
+                else if (papiReady(sender)) previewValue(sender, Bukkit.getOfflinePlayer(target.id), str(ctx, "글"), other = true)
                 1
             })))
             .build()
@@ -359,16 +359,25 @@ class ServerFeature(ess: Ess) : Feature(ess), CmiImportable {
         val per = 10
         val pages = (exp.placeholders.size + per - 1) / per
         val p = page.coerceIn(1, pages)
-        ess.messages.send(sender, "server-papi-list-header", Ph.of().value(exp.identifier).raw("{쪽}", p.toString()).raw("{전체}", pages.toString()).count(exp.placeholders.size))
+        ess.messages.send(sender, "server-papi-list-head", Ph.of().value(exp.identifier).raw("{쪽}", p.toString()).raw("{전체}", pages.toString()).count(exp.placeholders.size))
+        val viewer = sender as? Player
         for (raw in exp.placeholders.drop((p - 1) * per).take(per)) {
             val ph = if (raw.startsWith("%")) raw else "%$raw%"
-            // 매개변수 자리(<…>·{…})가 있으면 바로 볼 수 없다 — 입력창에 넣어 고쳐 쓰게.
-            val template = ph.contains('<') || ph.contains('{') || ph.contains('[')
-            val click = if (template) ClickEvent.suggestCommand("/플레이스홀더 값 $ph") else ClickEvent.runCommand("/플레이스홀더 값 $ph")
-            sender.sendMessage(
-                ess.messages.component("server-papi-line", Ph.of().value(noPapi(ph)), sender as? Player).clickEvent(click)
-                    .hoverEvent(HoverEvent.showText(ess.messages.component(if (template) "server-papi-line-hover-template" else "server-papi-line-hover", null, sender as? Player))),
-            )
+            // 값은 옆에 바로(2026-10-15 사용자 — 눌러서 보던 것을). 매개변수 자리(<…>·{…})가 있으면 값을 낼 수 없다 — 누르면 입력창에 넣어 고쳐 쓰게.
+            val line = if (PapiLine.isTemplate(ph)) {
+                ess.messages.component("server-papi-entry-template", Ph.of().value(noPapi(ph)), viewer)
+                    .clickEvent(ClickEvent.suggestCommand("/플레이스홀더 값 $ph"))
+                    .hoverEvent(HoverEvent.showText(ess.messages.component("server-papi-entry-hover-template", null, viewer)))
+            } else {
+                val shown = PapiLine.shown(ph, PapiView.parse(viewer, ph))
+                ess.messages.component(
+                    "server-papi-entry",
+                    Ph.of().value(noPapi(ph)).raw("{결과}", if (shown == null) ess.messages.raw("server-papi-entry-blank") else escape(shown)),
+                    viewer,
+                ).clickEvent(ClickEvent.copyToClipboard(ph))
+                    .hoverEvent(HoverEvent.showText(ess.messages.component("server-papi-entry-hover", null, viewer)))
+            }
+            sender.sendMessage(line)
         }
         if (p < pages) sender.sendMessage(ess.messages.component("server-papi-more", Ph.of().value(exp.identifier).raw("{쪽}", (p + 1).toString()), sender as? Player).clickEvent(ClickEvent.runCommand("/플레이스홀더 목록 ${exp.identifier} ${p + 1}")))
     }
@@ -376,9 +385,14 @@ class ServerFeature(ess: Ess) : Feature(ess), CmiImportable {
     /** 메시지는 PlaceholderAPI 를 한 번 더 지난다 — 보여 줄 자리표시 글이 풀리지 않게 `%` 를 비슷한 글자로. */
     private fun noPapi(text: String): String = text.replace('%', '％')
 
-    private fun previewValue(sender: CommandSender, subject: org.bukkit.OfflinePlayer?, text: String) {
+    /** 값을 MiniMessage 에 넣을 글로 — `%` 는 다시 풀리지 않게, `<` 는 태그로 읽히지 않게. */
+    private fun escape(value: String): String = noPapi(value).replace("<", "\\<")
+
+    /** [other] = 남의 값(`보기`) — 그때만 누구 값인지 적는다. 내 값은 표기 없이. */
+    private fun previewValue(sender: CommandSender, subject: org.bukkit.OfflinePlayer?, text: String, other: Boolean) {
         val value = PapiView.parse(subject, text)
-        ess.messages.send(sender, "server-papi-value", Ph.of().value(noPapi(text)).raw("{결과}", noPapi(value).replace("<", "\\<")).target(subject?.name ?: "-"))
+        val ph = Ph.of().value(noPapi(text)).raw("{결과}", escape(value)).target(subject?.name ?: "-")
+        ess.messages.send(sender, if (other) "server-papi-result-other" else "server-papi-result", ph)
     }
 
     // --- 책 ---
@@ -872,12 +886,15 @@ class ServerFeature(ess: Ess) : Feature(ess), CmiImportable {
             "server-papi-expansion-hover" to "<gray>％{값}_…％ · 만든이 {만든이} · 판 {판}</gray>",
             "server-papi-unknown" to "<red>'{값}' 확장이 없습니다.</red>",
             "server-papi-no-list" to "<yellow>{값} 확장은 자기 목록(getPlaceholders)을 내지 않습니다.</yellow> <gray>/플레이스홀더 값 ％{값}_…％ 로 직접 보세요.</gray>",
-            "server-papi-list-header" to "<gold>％{값}_…％</gold> <gray>{개수}개 · {쪽}/{전체}쪽 — 누르면 값</gray>",
-            "server-papi-line" to "<white>{값}</white>",
-            "server-papi-line-hover" to "<gray>누르면 내 기준 값을 봅니다</gray>",
-            "server-papi-line-hover-template" to "<gray>매개변수가 있는 자리표시입니다 — 입력창에 넣으니 고쳐 쓰세요</gray>",
+            "server-papi-list-head" to "<gold>％{값}_…％</gold> <gray>{개수}개 · {쪽}/{전체}쪽 — 누르면 자리표시 복사</gray>",
+            "server-papi-entry" to "<white>{값}</white> <dark_gray>→</dark_gray> <aqua>{결과}</aqua>",
+            "server-papi-entry-blank" to "<dark_gray>(값 없음)</dark_gray>",
+            "server-papi-entry-template" to "<white>{값}</white> <dark_gray>→ (매개변수 필요)</dark_gray>",
+            "server-papi-entry-hover" to "<gray>누르면 자리표시를 복사합니다</gray>",
+            "server-papi-entry-hover-template" to "<gray>매개변수가 있는 자리표시입니다 — 누르면 입력창에 넣으니 고쳐 써서 값을 보세요</gray>",
             "server-papi-more" to "<gray><u>다음 쪽 ▶</u></gray>",
-            "server-papi-value" to "<gray>{값}</gray> <gray>({대상} 기준) →</gray> <white>{결과}</white>",
+            "server-papi-result" to "<gray>{값}</gray> <dark_gray>→</dark_gray> <white>{결과}</white>",
+            "server-papi-result-other" to "<gray>{값}</gray> <dark_gray>({대상}) →</dark_gray> <white>{결과}</white>",
             // --- 책 ---
             "server-book-list" to "<gold>책으로 만들 텍스트 {개수}개</gold> <gray>— /책 받기 <이름> · /책 열기 <이름></gray>",
             "server-book-given" to "<green>책 '{값}' 을(를) {개수}명에게 주었습니다.</green>",

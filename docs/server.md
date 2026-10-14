@@ -17,8 +17,8 @@ getbook · openbook · book(+ config `Books`) · ctext · editctext · ctellraw 
 | `/최대인원 [수]` (maxplayers) | 지금 접속/최대 · 바꾸기(재시작해도 남는다 — 켤 때 다시 건다) | `inmcessentials.server.maxplayers` (OP) |
 | `/서버소개 [글\|초기화]` (setmotd) | 서버 목록 글. 두 줄은 `\|` 또는 `\n` 으로. 없으면 지금 글, `초기화` = 설정 `motd.lines`(비었으면 server.properties) | `inmcessentials.server.motd` (OP) |
 | `/플레이스홀더` (placeholders) | PlaceholderAPI 확장을 **플러그인별로** — 누르면 그 확장의 자리표시 목록 | `inmcessentials.server.placeholders` (OP) |
-| `/플레이스홀더 목록 <식별자> [쪽]` | 그 확장의 `getPlaceholders()` 10개씩. 누르면 내 기준 값(매개변수 자리가 있으면 입력창에) | 같음 |
-| `/플레이스홀더 값 <글>` · `보기 <플레이어> <글>` | 글 속 자리표시를 나(또는 그 사람 — 오프라인도) 기준으로 풀어 본다 — CMI `placeholders parse` | 같음 · 남 `.placeholders.others` (OP) |
+| `/플레이스홀더 목록 <식별자> [쪽]` | 그 확장의 `getPlaceholders()` 10개씩 — **자리표시 옆에 지금 값**(`%inmceco_balance% → 94687`). 매개변수 자리가 있으면 `(매개변수 필요)` · 누르면 입력창에, 아니면 누르면 자리표시 복사 | 같음 |
+| `/플레이스홀더 값 <글>` · `보기 <플레이어> <글>` | 글 속 자리표시를 풀어 본다(`값` 은 나, `보기` 는 그 사람 — 오프라인도. 남의 값일 때만 누구 값인지 적는다) | 같음 · 남 `.placeholders.others` (OP) |
 | `/책` (getbook) | 책으로 만들 텍스트 목록 | `.book`·`.book.open`·`.book.edit` 중 하나 |
 | `/책 <이름> [대상\|all]` · `/책 받기 <이름> …` | 그 텍스트를 쓴 책 아이템(가방이 차면 우편 — 우편 기능이 없으면 발밑) | `inmcessentials.server.book` (OP) · 남 `.book.others` (OP) |
 | `/책 열기 <이름> [대상\|all]` | 아이템 없이 책 화면으로 바로 — CMI `openbook` | `inmcessentials.server.book.open` (모두) · 남 `.book.others` |

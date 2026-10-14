@@ -60,6 +60,22 @@ class Messages(values: Map<String, String>, val defaults: Map<String, String>) :
                 "<red>/에센셜 모듈</red> <gray>- 기능 목록과 켜짐</gray>",
             ).joinToString("\n"),
 
+            "help-admin-players" to "<gray>플레이어 명령 목록은</gray> <gold>/도움말</gold>",
+            "help-admin-root" to "<red>/에센셜</red> <gray>- 관리(리로드·검증·모듈·가져오기 …) · 플레이어 명령은</gray> <gold>/도움말</gold>",
+
+            // --- /도움말 ------------------------------------------------------------
+            "help-header" to "<gold>명령어 {개수}개</gold> <gray>· {쪽}/{전체}쪽 — 누르면 입력창에 · /도움말 <명령> 은 쓰는 법</gray>",
+            "help-group" to "<yellow>■ {값}</yellow>",
+            "help-line" to " <gold>/{값}</gold> <dark_gray>{별칭}</dark_gray> <gray>- {설명}</gray>",
+            "help-line-hover" to "<gray>누르면 입력창에 /{값} · /도움말 {값} 으로 쓰는 법</gray>",
+            "help-prev" to "<gray><u>◀ 이전 쪽</u></gray>",
+            "help-next" to "<gray><u>다음 쪽 ▶</u></gray>",
+            "help-empty" to "<gray>쓸 수 있는 명령이 없습니다.</gray>",
+            "help-unknown" to "<red>'{값}' 은(는) 쓸 수 있는 명령이 아닙니다.</red> <gray>/도움말 로 목록을 보세요.</gray>",
+            "help-detail-header" to "<gold>/{값}</gold> <dark_gray>({별칭})</dark_gray> <gray>- {설명}</gray>",
+            "help-detail-usage" to " <white>{값}</white>",
+            "help-detail-more" to " <gray>… 외 {개수}가지</gray>",
+
             // --- core 보상·우편함·순위 -------------------------------------------------
             "reward-inventory-full" to "<yellow>가방이 가득 차서 일부 보상을 우편으로 보냈습니다.</yellow> <gray>/우편</gray>",
             "reward-dropped" to "<yellow>가방이 가득 차서 일부 보상을 바닥에 떨어뜨렸습니다.</yellow>",
