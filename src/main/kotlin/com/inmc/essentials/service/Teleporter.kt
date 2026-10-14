@@ -24,7 +24,9 @@ interface Teleporter {
         /** teleport 기능이 꺼져 있을 때 — 안전 확인도 기록도 없이 옮기기만. */
         val PLAIN: Teleporter = object : Teleporter {
             override fun teleport(player: Player, to: Location, kind: TeleportKind, safe: Boolean): CompletableFuture<Boolean> =
-                player.teleportAsync(to, PlayerTeleportEvent.TeleportCause.PLUGIN)
+                // 포탈만 모드를 넘는다(core `Realms.travel` — EssTeleporter 와 같은 규칙).
+                if (kind == TeleportKind.PORTAL) kr.inmc.core.integration.Realms.travel(player, to)
+                else player.teleportAsync(to, PlayerTeleportEvent.TeleportCause.PLUGIN)
         }
     }
 }

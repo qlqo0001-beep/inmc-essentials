@@ -8,6 +8,8 @@ import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.context.CommandContext
 import io.papermc.paper.command.brigadier.CommandSourceStack
 import io.papermc.paper.command.brigadier.Commands
+import kr.inmc.core.integration.PlaceNames
+import kr.inmc.core.integration.Realms
 import kr.inmc.core.integration.Vanish
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender
@@ -29,11 +31,7 @@ class SpawnCommand(private val ess: Ess, private val service: SpawnService) {
         Commands.literal("스폰").requires { canUse(it.sender) }
             .executes { ctx -> player(ctx)?.let { self(it, label(ctx)) }; 1 }
             .then(Commands.literal("설정").requires { isAdmin(it.sender) }.executes { ctx ->
-                player(ctx)?.let { p ->
-                    val point = SpawnPoint.of(p.location)
-                    service.update { it.copy(point = point) }
-                    ess.messages.send(p, "spawn-set", Ph.of().value(point.describe()))
-                }
+                player(ctx)?.let { p -> setServerSpawn(p) }
                 1
             })
             .then(Commands.literal("처음설정").requires { isAdmin(it.sender) }.executes { ctx ->
@@ -82,7 +80,7 @@ class SpawnCommand(private val ess: Ess, private val service: SpawnService) {
 
     /** 이동 — 흩는 반경이 있으면 고른 칸의 청크를 비동기로 올린 뒤. 메인 스레드에서 [after] 를 부른다. */
     private fun go(player: Player, after: (Boolean) -> Unit) {
-        service.scatterAsync(service.target(), service.config.radius).whenComplete { to, scatterError ->
+        service.scatterAsync(service.target(player), service.config.radius).whenComplete { to, scatterError ->
             onMain(player) {
                 if (scatterError != null || to == null || !player.isOnline) return@onMain after(false)
                 ess.teleporter.teleport(player, to, TeleportKind.SPAWN).whenComplete { ok, error ->
@@ -92,6 +90,11 @@ class SpawnCommand(private val ess: Ess, private val service: SpawnService) {
             }
         }
     }
+
+    /**
+     * `/스폰 설정` — 모드가 있으면 **선 곳의 모드 스폰**(core `Realms` — inmc-worlds 가 쥔다, 2026-10-15), 없으면(또는 빌려 쓰는 월드면) 서버 스폰.
+     */
+    private fun setServerSpawn(p: Player) = setSpawnHere(ess, service, p)
 
     private fun onMain(player: Player, block: () -> Unit) {
         if (Bukkit.isPrimaryThread()) block() else player.scheduler.run(ess.plugin, { block() }, null)
@@ -114,4 +117,16 @@ class SpawnCommand(private val ess: Ess, private val service: SpawnService) {
 
         fun isAdmin(sender: CommandSender): Boolean = sender.hasPermission(SpawnFeature.ADMIN) || sender.hasPermission(SpawnFeature.OLD_ADMIN)
     }
+}
+
+/** 선 곳을 스폰으로 — 모드가 있으면 그 모드의 스폰, 없으면(또는 빌려 쓰는 월드면) 서버 스폰. 명령과 관리 화면이 같이 쓴다. */
+internal fun setSpawnHere(ess: Ess, service: SpawnService, p: Player) {
+    val point = SpawnPoint.of(p.location)
+    val mode = if (Realms.available) Realms.ofWorld(p.world) else null
+    if (mode != null && Realms.setSpawn(mode, p.location)) {
+        ess.messages.send(p, "spawn-set", Ph.of().value(point.describe() + " · " + PlaceNames.plain(Realms.name(mode))))
+        return
+    }
+    service.update { it.copy(point = point) }
+    ess.messages.send(p, "spawn-set", Ph.of().value(point.describe()))
 }

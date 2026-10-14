@@ -293,7 +293,7 @@ class SpawnFeature(ess: Ess) : Feature(ess), CmiImportable {
             }.map { "${it.plugin.name}(${it.priority})" }.distinct()
             when {
                 !ours -> "부활 리스너가 HIGH 에 없습니다"
-                others.isNotEmpty() -> "부활 자리를 뒤에서 바꿀 수 있는 플러그인: ${others.joinToString(", ")} — CMI ReSpawn.Enabled·Multiverse 의 부활 처리를 끄세요"
+                others.isNotEmpty() -> "부활 자리를 뒤에서 바꿀 수 있는 플러그인: ${others.joinToString(", ")} — CMI ReSpawn.Enabled 같은 부활 처리를 끄세요"
                 else -> null
             }
         },
@@ -349,9 +349,10 @@ class SpawnFeature(ess: Ess) : Feature(ess), CmiImportable {
 
         /**
          * 부활 자리를 우리 뒤에서 고쳐도 되는 플러그인 — 던전 판 안 부활(RunListener HIGHEST)은 일부러 이긴다.
-         * Multiverse-Inventories 는 자리를 바꾸지 않고(가방만), WorldGuard·Lands 는 관리자가 그 구역에 부활 깃발을 걸었을 때만 바꾼다(의도된 것).
+         * inmc-worlds(HIGHEST)는 다른 모드의 월드로 부활하려 할 때만 그 사람 모드의 스폰으로 고친다(2026-10-15 — 모드 사이로 몸이 새지 않게),
+         * WorldGuard·Lands 는 관리자가 그 구역에 부활 깃발을 걸었을 때만 바꾼다(의도된 것).
          */
-        private val RESPAWN_ALLOWED = setOf("inmc-dungeon", "Multiverse-Inventories", "WorldGuard", "Lands")
+        private val RESPAWN_ALLOWED = setOf("inmc-dungeon", "inmc-worlds", "WorldGuard", "Lands")
 
         private const val KIND = "스폰"
 

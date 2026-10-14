@@ -91,7 +91,7 @@ Shift+F 메뉴의 스폰 버튼(`player: 스폰`)은 2026-10-10 부터 `/스폰`
 
 - 접속 자리 `AsyncPlayerSpawnLocationEvent` **HIGH**, 부활 `PlayerRespawnEvent` **HIGH** — 던전(`GuardListener`·`RunListener`, HIGHEST)이 뒤에서 이긴다.
 - CMI·Multiverse 도 부활 자리를 고친다. 같은 HIGH 면 켜진 순서로 갈리므로 **바꾸는 날 CMI `ReSpawn.Enabled: false` · `Spawn.FirstSpawn.Use: false` ·
-  `Newbie.Kit` 비우기 · `Optimizations.ImmortalityOnJoin: 0` · Modules `homeInteractions` 끄기**, Multiverse `enforce-respawn-at-world-spawn: false` 권장.
+  `Newbie.Kit` 비우기 · `Optimizations.ImmortalityOnJoin: 0` · Modules `homeInteractions` 끄기**, Multiverse 는 inmc-worlds 로 바꿨다(2026-10-15) — 모드가 있으면 스폰은 그 사람 모드의 스폰(`/스폰 설정` = 선 곳의 모드 스폰), inmc-worlds 는 다른 모드 월드로 부활하려 할 때만 고친다.
   `/에센셜 검증` 의 "부활 자리를 덮는 다른 플러그인이 없다" 가 부활 사건의 등록 목록(HIGH·HIGHEST 의 다른 플러그인 — 던전 빼고)을 본다
   (진짜 부활 사건은 쏘지 않는다 — 다른 플러그인의 부활 처리가 관리자에게 일어나지 않게).
 - inmc-menu 의 옛 판(스폰을 아직 가진 판)이 같이 켜져 있으면 켤 때 경고한다 — 스폰을 뺀 inmc-menu 와 같은 재시작에 넣을 것.

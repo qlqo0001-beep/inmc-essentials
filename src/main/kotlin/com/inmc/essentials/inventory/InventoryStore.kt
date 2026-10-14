@@ -78,8 +78,8 @@ class InvData(
 }
 
 /**
- * 나갈 때(또는 서버를 끌 때)의 모습 — 가방 41칸·엔더 27칸 바이트, 각각의 지문([InvHash]), 그때의 월드와 Multiverse-Inventories 그룹
- * (없으면 null — [MvInvGroups]), 시각.
+ * 나갈 때(또는 서버를 끌 때)의 모습 — 가방 41칸·엔더 27칸 바이트, 각각의 지문([InvHash]), 그때의 월드와 가방 칸(모드)
+ * (모드가 없으면 null — [InvGroups]), 시각.
  */
 class Snapshot(
     val at: Long,

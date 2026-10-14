@@ -2,6 +2,17 @@
 
 ---
 
+## 미배포 — Multiverse 대신 inmc-worlds 모드(2026-10-15)
+
+- **오프라인 가방 편집**: Multiverse-Inventories 그룹(리플렉션 `MvInvGroups`)을 지우고 `InvGroups` — core `Realms.scope("worlds.inventory", player)` 로 가방 칸을 가른다.
+  나갈 때 모습·대기 편집의 그룹 열(`mv_group`)에 그 칸을 적는다(열 이름은 그대로). inmc-worlds 는 접속·월드 이동 LOWEST 에서 몸을 바꾸므로 지연 틱 계약은 그대로.
+- **스폰**: 모드가 있으면 그 사람 모드의 스폰(`SpawnService.target(player)`·`modeSpawn` — `/스폰`·매 접속·부활 SERVER 칸·첫 스폰의 대체). `/스폰 설정`·관리 화면은
+  선 곳의 **모드 스폰**을 정한다(`Realms.setSpawn` — 빌려 쓰는 월드면 전처럼 서버 스폰). 부활 순서의 홈·침대 홈·워프는 같은 모드일 때만.
+  부활 허용 목록에서 Multiverse-Inventories 를 빼고 inmc-worlds 를 넣었다.
+- **채팅**: 채팅 묶음이 다른 모드끼리는 공개 채팅이 안 보인다(`Drop.REALM` — `Realms.sameChat`, "근처에 아무도" 알림도 같은 규칙).
+- **포탈**: essentials 포탈(이동 종류 PORTAL)만 모드를 넘는다 — `Realms.travel`. 그 밖의 이동은 inmc-worlds 가 다른 모드로 가는 것을 막는다.
+- `paper-plugin.yml` 의 Multiverse-Core 줄을 뺐다.
+
 ## 미배포 — 생물군계 이름은 core 창구로 · 인벤 직렬화는 core 로(2026-10-15)
 
 - `/바이옴찾기` 의 타이틀포지 이름을 core `PlaceNames` 로 읽는다(전에는 `biomeNameOf` 리플렉션). 보이는 것·찾는 규칙은 그대로.

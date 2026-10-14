@@ -13,7 +13,7 @@
 |---|---|
 | 서버 | Paper/Leaf 26.2 (`api-version` 은 빌드가 넣는다) |
 | **필수 의존** | **`inmc-core`** (Kotlin 런타임 · 보상/우편함/순위 · `Mail`·`Vanish`·`Selections`·`ChatVisibility` 창구 · `CustomItemHook.ids()`/`makeOnlyNamespaces()`) — **core 와 같은 묶음으로 배포**(옛 core jar 와 섞으면 `NoSuchMethodError`) |
-| 선택 연동 | PlaceholderAPI(컴파일 의존 — 식별자 `inmcplayer`·`inmcchat`·`inmcmod`) · LuckPerms · WorldEdit/FAWE · WorldGuard · Lands · VotifierPlus/NuVotifier · CoreProtect · InMc-TitleForge · Multiverse-Core/-Inventories · inmc-monster(PDC 읽기만) · inmc-dungeon — 전부 리플렉션(`ReflectionPurityTest`) |
+| 선택 연동 | PlaceholderAPI(컴파일 의존 — 식별자 `inmcplayer`·`inmcchat`·`inmcmod`) · LuckPerms · WorldEdit/FAWE · WorldGuard · Lands · VotifierPlus/NuVotifier · CoreProtect · InMc-TitleForge · inmc-monster(PDC 읽기만) · inmc-dungeon — 전부 리플렉션(`ReflectionPurityTest`). 모드(inmc-worlds)는 core `Realms`·월드·생물군계 이름은 core `PlaceNames` 로 |
 | 데이터 | `plugins/inmc-essentials/` — `config.yml` · `messages/*.yml` · `settings/<기능>.yml` · `data/essentials.db`(SQLite, `storage.type: mysql` 이면 공용 DB) · `commands/aliases.yml`·`schedules.yml` · `warps.yml` · `spawn.yml` · `portals.yml` · `holograms.yml` · `jails.yml` · `text/`·`books/` · `verify/` · `import/` · `logs/` |
 
 ## 기능 19개
@@ -29,7 +29,7 @@
 | player | `player` | 게임모드·경험치·최대체력·회복·배고픔·효과·처치·자살·속도·무적/시간제·비행/시간제·충돌·토템·타기·내리기·모자·앉기·근처·핑 · 체력 보스바 · PAPI `inmcplayer` | [docs/player.md](docs/player.md) |
 | afk | `afk` | `/잠수`·`/잠수확인` — 자동 잠수·제목·진입/해제 명령·잠수 중 보호·우회 막기·자동 추방·몹 생성 막기 | [docs/afk.md](docs/afk.md) |
 | items | `item` | `/지급`·`/전원지급`·`/머리`·`/몹머리`·`/장식`·`/이름`·`/설명`·`/염색`·`/비우기`·`/검색` · 가상 작업대 7종·`/거래창` · 셜커 배낭 | [docs/items.md](docs/items.md) |
-| inventory | `inventory` | `/인벤`·`/엔더`·`/엔더비우기`·`/인벤저장`·`/인벤목록`·`/인벤불러오기`·`/인벤삭제`·`/몰래열기` · 오프라인 편집(대기 편집)·나갈 때 스냅샷·MV-Inv 그룹 | [docs/inventory.md](docs/inventory.md) |
+| inventory | `inventory` | `/인벤`·`/엔더`·`/엔더비우기`·`/인벤저장`·`/인벤목록`·`/인벤불러오기`·`/인벤삭제`·`/몰래열기` · 오프라인 편집(대기 편집)·나갈 때 스냅샷·가방 칸(모드) | [docs/inventory.md](docs/inventory.md) |
 | kits | `kit` | `/킷`·`/킷편집`·`/킷초기화` — 쿨타임·횟수·비용·조건·명령·그룹과 무게·첫 접속 킷·화면 | [docs/kits.md](docs/kits.md) |
 | world | `world` | `/바이옴찾기`·`/게임규칙`·`/청크복구`·`/조명수정`·`/몹제거`·`/날씨`(sun·rain·storm)·`/시간`(day·night) · 월드 제한(게임모드·비행·무적·지붕·겉날개·몹 스폰) · 잠자기 가속·현실 시간 | [docs/world.md](docs/world.md) |
 | decor | `decor` | `/갑옷거치대`(편집기·템플릿)·`/표지판편집`·`/표지판복사`·`/동적표지판`·`/액자` · 그림 편집 · 웅크림 표지판 편집 · 바닐라 편집 화면 제어 | [docs/decor.md](docs/decor.md) |

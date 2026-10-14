@@ -4,6 +4,7 @@ import com.inmc.essentials.Ess
 import com.inmc.essentials.util.Ph
 import io.papermc.paper.event.player.AsyncChatEvent
 import kr.inmc.core.integration.PlayerSettings
+import kr.inmc.core.integration.Realms
 import kr.inmc.core.integration.Vanish
 import net.kyori.adventure.text.Component
 import net.kyori.adventure.text.TextReplacementConfig
@@ -194,13 +195,13 @@ class ChatListener(private val ess: Ess, private val feature: ChatFeature, priva
     private fun nobodyNear(sender: Player, range: Double): Boolean {
         val origin = sender.location
         return Bukkit.getOnlinePlayers().none { other ->
-            other != sender && Vanish.canSee(sender, other) &&
+            other != sender && Vanish.canSee(sender, other) && Realms.sameChat(sender, other) &&
                 ChatRules.inRange(range, other.world == origin.world, if (other.world == origin.world) other.location.distanceSquared(origin) else Double.MAX_VALUE)
         }
     }
 
-    /** 받는 사람이 빠지는 까닭. */
-    enum class Drop { IGNORE, SILENCE, RANGE }
+    /** 받는 사람이 빠지는 까닭. REALM = 채팅 묶음이 다른 모드(core `Realms` — inmc-worlds, 2026-10-15). */
+    enum class Drop { REALM, IGNORE, SILENCE, RANGE }
 
     /**
      * 받는 사람 거르기. 보낸 사람 자신·콘솔은 늘 남는다. 빠지는 까닭은 [dropOf]. 거리 밖으로 빠진 범위 스파이는 [rangeSpies] 에 담는다.
@@ -213,19 +214,21 @@ class ChatListener(private val ess: Ess, private val feature: ChatFeature, priva
         while (iterator.hasNext()) {
             val viewer = iterator.next() as? Player ?: continue
             if (viewer.uniqueId == sender.uniqueId) continue
-            val drop = dropOf(viewer, sender.uniqueId, ignoreBypass, silenceBypass, origin, range) ?: continue
+            val drop = dropOf(viewer, sender.uniqueId, ignoreBypass, silenceBypass, origin, range, sameChat = Realms.sameChat(sender, viewer)) ?: continue
             iterator.remove()
             if (drop == Drop.RANGE && service.isRangeSpy(viewer)) rangeSpies += viewer
         }
     }
 
     /**
-     * [viewer] 가 [senderId] 의 공개 채팅을 못 받는 까닭(받으면 null): 보낸 사람을 무시함(`ignore.public-chat`) · 전체 채팅 끔 · 거리 밖([range] null 이면 늘 닿음).
+     * [viewer] 가 [senderId] 의 공개 채팅을 못 받는 까닭(받으면 null): 채팅 묶음이 다른 모드([sameChat] false) · 보낸 사람을 무시함(`ignore.public-chat`) ·
+     * 전체 채팅 끔 · 거리 밖([range] null 이면 늘 닿음).
      */
     internal fun dropOf(
         viewer: Player, senderId: UUID, ignoreBypass: Boolean, silenceBypass: Boolean, origin: Location, range: Double?,
-        silenced: Boolean = isSilenced(viewer),
+        silenced: Boolean = isSilenced(viewer), sameChat: Boolean = true,
     ): Drop? = when {
+        !sameChat -> Drop.REALM
         settings.ignorePublic && !ignoreBypass && feature.store.ignores(viewer.uniqueId, senderId) -> Drop.IGNORE
         !silenceBypass && silenced -> Drop.SILENCE
         !ChatRules.inRange(range, viewer.world == origin.world, if (viewer.world == origin.world) viewer.location.distanceSquared(origin) else Double.MAX_VALUE) -> Drop.RANGE

@@ -123,11 +123,11 @@ data class SpawnConfig(
 
     /**
      * 접속 자리(순수). [isNew] = 처음 들어온 사람(`AsyncPlayerSpawnLocationEvent.isNewPlayer`), [fromWorld] = 나갈 때 있던 월드,
-     * [ignoredWorlds] = 매 접속 보내기에서 뺄 월드(CMI IgnoredWorlds).
+     * [ignoredWorlds] = 매 접속 보내기에서 뺄 월드(CMI IgnoredWorlds). [modes] = 모드가 있다(모드 스폰이 서버 스폰을 대신한다 — 2026-10-15).
      */
-    fun joinTarget(isNew: Boolean, fromWorld: String?, ignoredWorlds: Set<String>): JoinTarget = when {
-        isNew && firstJoin && (firstPoint != null || point != null) -> JoinTarget.FIRST
-        everyJoin && point != null && (fromWorld == null || ignoredWorlds.none { it.equals(fromWorld, ignoreCase = true) }) -> JoinTarget.SERVER
+    fun joinTarget(isNew: Boolean, fromWorld: String?, ignoredWorlds: Set<String>, modes: Boolean = false): JoinTarget = when {
+        isNew && firstJoin && (firstPoint != null || point != null || modes) -> JoinTarget.FIRST
+        everyJoin && (point != null || modes) && (fromWorld == null || ignoredWorlds.none { it.equals(fromWorld, ignoreCase = true) }) -> JoinTarget.SERVER
         else -> JoinTarget.NONE
     }
 

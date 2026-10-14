@@ -18,7 +18,6 @@ dependencies:
     Votifier:            { load: OMIT,   required: false, join-classpath: true }
     CoreProtect:         { load: OMIT,   required: false, join-classpath: true }
     InMc-TitleForge:     { load: OMIT,   required: false, join-classpath: true }
-    Multiverse-Core:     { load: OMIT,   required: false, join-classpath: true }
 
 # commands 절은 paper-plugin.yml 에 없다 - Brigadier 로 등록한다(command/CommandRegistry).
 

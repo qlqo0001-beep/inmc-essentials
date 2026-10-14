@@ -11,7 +11,7 @@ data class InventorySettings(
     val disableOffline: Boolean = false,
     /** 나갈 때(그리고 서버를 끌 때) 가방·엔더를 DB 에 남긴다 — 접속하지 않은 사람 보기·고치기의 근거. */
     val snapshotOnQuit: Boolean = true,
-    /** 오프라인 편집을 접속(·월드 이동) 뒤 몇 틱 기다렸다 적용할까 — Multiverse-Inventories 가 자기 프로필을 먼저 다 얹도록(1~100). */
+    /** 오프라인 편집을 접속(·월드 이동) 뒤 몇 틱 기다렸다 적용할까 — 모드 공급처(inmc-worlds)가 몸을 먼저 다 맞추도록(1~100). */
     val applyDelayTicks: Int = 2,
     val saved: SavedSettings = SavedSettings(),
     /** 투명 중이면 조용히 열기가 저절로 켜진다(CMI Vanish noisyChest 기본 false 와 같은 뜻). */

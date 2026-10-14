@@ -30,7 +30,7 @@ CMI 의 inv(invsee) · ender · clearender · invsave · invload · invlist · i
 | `inv.blacklist` | `[]` | 열 수 없는 사람(이름, op 는 우회 — CMI Inv.BlackList) |
 | `inv.disable-offline` | `false` | 접속하지 않은 사람의 가방·엔더 보기·고치기를 막는다(CMI Inv.DisableOffline) |
 | `inv.snapshot-on-quit` | `true` | 나갈 때(그리고 서버를 끌 때) 가방·엔더를 남긴다 — 끄면 오프라인 보기·고치기를 못 쓴다 |
-| `inv.offline-apply-delay-ticks` | `2` | 오프라인 편집을 접속(·그 그룹 월드로 이동) 뒤 몇 틱 기다렸다 적용할지(1~100) — MV-Inventories 가 먼저 다 얹게 |
+| `inv.offline-apply-delay-ticks` | `2` | 오프라인 편집을 접속(·그 모드로 이동) 뒤 몇 틱 기다렸다 적용할지(1~100) — 모드 공급처(inmc-worlds)가 몸을 먼저 다 맞추게 |
 | `saved.*` | | 저장 인벤(아래) |
 | `silent-chest.auto-when-vanished` | `true` | 투명 중이면 조용히 열기가 저절로 |
 
@@ -63,9 +63,8 @@ CMI 의 inv(invsee) · ender · clearender · invsave · invload · invlist · i
 ## 접속하지 않은 사람 — 보기와 고치기
 
 **모습 남기기.** `inv.snapshot-on-quit` 이면 나갈 때(PlayerQuitEvent MONITOR)와 **서버를 끌 때 접속 중인 모든 사람**(끌 때는 나가기 사건이 오지 않는다) 의
-가방 41칸(갑옷·왼손 포함)·엔더 27칸 바이트, 각각의 지문(SHA-256), 그때의 월드, 그 월드의 **Multiverse-Inventories 그룹**(MV-Inv 가 없으면 비움), 시각을
-`ess_inventory_snapshots` 에 남긴다. 서버를 끌 때 MV-Inv 가 우리보다 먼저 꺼져 있어도 그룹이 비지 않게, 접속·월드 이동마다 그 월드의 그룹 열쇠를 기억해 두고
-플러그인이 꺼져 있으면 마지막 열쇠를 쓴다(`MvInvGroups`). 이 플러그인을 넣기 전에 나간 사람은 모습이 없다(`/검색` 은 .dat 를 읽는다).
+가방 41칸(갑옷·왼손 포함)·엔더 27칸 바이트, 각각의 지문(SHA-256), 그때의 월드, 그 사람의 **가방 칸**(모드 — core `Realms.scope("worlds.inventory")`, 모드가 없으면 비움 — `InvGroups`, 2026-10-15), 시각을
+`ess_inventory_snapshots` 에 남긴다(열 이름은 옛 그대로 `mv_group`). 모드 공급처는 우리보다 먼저 켜지고 늦게 꺼져 끌 때의 모습에도 칸이 남는다. 이 플러그인을 넣기 전에 나간 사람은 모습이 없다(`/검색` 은 .dat 를 읽는다).
 
 **고치기.** `/인벤 <이름>`·`/엔더 <이름>` 을 접속하지 않은 사람에게 쓰면, 오프라인 권한(`.inv.offline`)과 그 쪽 고치기 권한(`.inv.edit` · `.ender.edit`)이
 있을 때 **고칠 수 있는 창**이 열린다(빨간 제목 "… 오프라인 편집"). 창의 내용은 **기다리는 편집이 있으면 그것, 없으면 나갈 때 모습**이다.
@@ -82,11 +81,9 @@ CMI 의 inv(invsee) · ender · clearender · invsave · invload · invlist · i
 **적용.** 그 사람이 들어오면(PlayerJoinEvent MONITOR):
 
 1. 열린 편집 창을 저장하고 닫는다.
-2. 그 사람의 **지금 MV-Inv 그룹**이 편집의 그룹과 같으면(또는 MV-Inv 가 없으면) DB 에 '적용하려 함' 표를 쓰고, 끝나면 `offline-apply-delay-ticks`(2) 틱
-   뒤에 적용한다. MV-Inventories 5.3.3 `ShareHandleListener` 의 접속 처리(`playerJoin`)는 우선순위 표시가 없어 Multiverse-Core 동적 리스너의 기본값
-   **NORMAL**, 월드 이동 처리(`playerChangedWorld`)는 `@DefaultEventPriority(LOW)` 이고(서버 jar 를 javap 로 확인) 프로필을 그 처리 안에서 바로 얹는다 —
-   둘 다 Multiverse-Core 의 event-priority 설정(`EventPriorityMapper`)으로 바꿀 수 있으니, 그쪽을 MONITOR 로 올렸다면 지연 틱을 줄이지 말 것.
-   우리 처리는 MONITOR 이고 거기서도 바로 얹지 않고 지연 틱 뒤에 얹는다.
+2. 그 사람의 **지금 가방 칸**이 편집의 칸과 같으면(또는 모드가 없으면) DB 에 '적용하려 함' 표를 쓰고, 끝나면 `offline-apply-delay-ticks`(2) 틱
+   뒤에 적용한다. 모드 공급처(inmc-worlds)는 접속·월드 이동 **LOWEST** 에서 그 자리에서 몸을 바꾸고(2026-10-15 — 전에는 Multiverse-Inventories 가 NORMAL/LOW),
+   우리 처리는 MONITOR 에서 지연 틱 뒤에 얹는다. 엔더 대기 편집도 가방 칸 열쇠를 따른다(엔더를 따로 토글한 서버의 한계).
 3. 지금 가방(또는 엔더)을 편집의 **바탕**과 견준다(지문, 다르면 칸별 비교로 다시 — 같은 아이템도 바이트 순서가 달라질 수 있다):
    - **같다** → 고친 내용으로 **통째로 덮는다**.
    - **이미 고친 내용과 같다** → 이미 적용된 것으로 보고 기록만 지운다.
@@ -142,8 +139,8 @@ CMI 의 저장 인벤(`cmi.sqlite.db` 의 `inventories` 표)은 형식을 확인
 
 가방 바이트 왕복(41칸) · 효과 글 왕복 · 보기만 하는 엔더 창의 진짜 클릭 사건이 막히는지 · `/인벤` 54칸 창에 갑옷·왼손이 보이고 칸막이 클릭이 막히는지 ·
 `/인벤` 창의 쓰기(사본 칸 → 진짜 칸)와 전부-아니면-무 판정 · 사본 안에서 옮긴 것의 맞비기기 · 오프라인 편집 넷(바뀌지 않은 가방은 통째로 덮기 · 그새 바뀐
-가방은 칸별로 얹고 못 뺀 것은 충돌 줄 · 다른 MV 그룹이면 미루기 · 두 번 적용하지 않기 — 모두 메모리만, 끝나면 가방을 되돌림) · MV-Inventories 진입점(있을 때) ·
-MV 그룹 열쇠 기억(지금 월드의 열쇠가 남아 있고 기억만으로도 답하는지 — 가짜 월드 이름으로, 끝나면 지움) ·
+가방은 칸별로 얹고 못 뺀 것은 충돌 줄 · 다른 가방 칸이면 미루기 · 두 번 적용하지 않기 — 모두 메모리만, 끝나면 가방을 되돌림) ·
+가방 칸 열쇠(모드가 있으면 core `Realms` 의 `worlds.inventory` scope 와 같은지) ·
 조용히 열기의 사본 대조 · 토글 · CoreProtect 진입점(있을 때). 조용히 열기의 쓰기는 월드의 상자를 고쳐야 해서 검증기에 넣지 않았다.
 
 ## CMI 와 다른 점

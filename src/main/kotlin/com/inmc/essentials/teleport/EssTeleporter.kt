@@ -106,7 +106,9 @@ class EssTeleporter(
         val suppress = suppressesBack(kind, s)
         if (suppress) service.suppress(player.uniqueId)
         val future = try {
-            player.teleportAsync(dest, PlayerTeleportEvent.TeleportCause.PLUGIN)
+            // 포탈은 모드를 넘어도 된다 — 넘으면 모드 공급처가 몸을 바꾼다(core `Realms.travel`, 사용자 결정 2026-10-15). 그 밖의 이동은 모드 공급처가 막는다.
+            if (kind == TeleportKind.PORTAL) kr.inmc.core.integration.Realms.travel(player, dest)
+            else player.teleportAsync(dest, PlayerTeleportEvent.TeleportCause.PLUGIN)
         } catch (t: Throwable) {
             if (suppress) service.unsuppress(player.uniqueId)
             throw t

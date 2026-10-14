@@ -174,13 +174,13 @@ class SavedInventories(private val ess: Ess, private val feature: InventoryFeatu
         if (feature.settings.snapshotOnQuit) snapshot(event.player)
     }
 
-    /** 가방 41칸·엔더 27칸 바이트와 지문 · 월드 · MV-Inventories 그룹 · 시각(오프라인 보기·고치기의 바탕 — [OfflineEdits]). */
+    /** 가방 41칸·엔더 27칸 바이트와 지문 · 월드 · 가방 칸(모드 — [InvGroups]) · 시각(오프라인 보기·고치기의 바탕 — [OfflineEdits]). */
     fun snapshot(player: Player) {
         val data = InvData.capture(player)
         val world = player.world.name
         val snap = Snapshot(
             System.currentTimeMillis(), InvData.encode(data.items), InvData.encode(data.ender),
-            InvHash.of(data.items), InvHash.of(data.ender), world, MvInvGroups.of(world),
+            InvHash.of(data.items), InvHash.of(data.ender), world, InvGroups.of(player),
         )
         val id = player.uniqueId
         val name = player.name

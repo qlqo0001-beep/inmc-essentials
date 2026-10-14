@@ -25,12 +25,10 @@ class SpawnAdminMenu(ess: Ess, viewer: Player, private val service: SpawnService
             "<yellow>▶ 클릭: 내가 선 곳으로 정하기</yellow>", "<yellow>▶ 우클릭: 그곳으로 가 보기</yellow>")) { event ->
             if (event.isRightClick) {
                 viewer.closeInventory()
-                ess.teleporter.teleport(viewer, service.target(), TeleportKind.ADMIN)
+                ess.teleporter.teleport(viewer, service.target(viewer), TeleportKind.ADMIN)
                 return@set
             }
-            val point = SpawnPoint.of(viewer.location)
-            service.update { it.copy(point = point) }
-            ess.messages.send(viewer, "spawn-set", Ph.of().value(point.describe()))
+            setSpawnHere(ess, service, viewer)
             refresh()
         }
         set(SLOT_FIRST_POINT, Icon.of(Material.RED_BED, "<yellow>첫 스폰</yellow>",
@@ -45,7 +43,7 @@ class SpawnAdminMenu(ess: Ess, viewer: Player, private val service: SpawnService
                     refresh()
                 }
                 event.isRightClick -> {
-                    val to = service.firstTarget() ?: service.target()
+                    val to = service.firstTarget(viewer.uniqueId) ?: service.target(viewer)
                     viewer.closeInventory()
                     ess.teleporter.teleport(viewer, to, TeleportKind.ADMIN)
                 }

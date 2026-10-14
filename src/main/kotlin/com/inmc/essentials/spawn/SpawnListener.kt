@@ -34,9 +34,9 @@ class SpawnListener(private val ess: Ess, private val feature: SpawnFeature, pri
             if (event.isNewPlayer) service.newPlayers += id
         }
         val c = service.config
-        when (c.joinTarget(event.isNewPlayer, event.spawnLocation.world?.name, feature.settings.ignoredWorlds)) {
-            JoinTarget.FIRST -> service.firstTarget()?.let { event.spawnLocation = it }
-            JoinTarget.SERVER -> c.point?.location()?.let { target ->
+        when (c.joinTarget(event.isNewPlayer, event.spawnLocation.world?.name, feature.settings.ignoredWorlds, kr.inmc.core.integration.Realms.available)) {
+            JoinTarget.FIRST -> service.firstTarget(id)?.let { event.spawnLocation = it }
+            JoinTarget.SERVER -> (id?.let(service::modeSpawn) ?: c.point?.location())?.let { target ->
                 val original = event.spawnLocation.clone()
                 event.spawnLocation = target
                 if (id != null) service.movedOnJoin[id] = SpawnService.JoinMove(original, target)

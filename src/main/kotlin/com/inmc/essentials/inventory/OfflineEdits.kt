@@ -38,15 +38,13 @@ import java.util.concurrent.ConcurrentHashMap
  * 접속하지 않은 사람의 가방·엔더 고치기(사용자 요구 2026-10-10 "복사본을 저장해 두고 그 사람이 들어올 때 덮어쓴다").
  *
  * 1. **모습**: 나갈 때(PlayerQuitEvent MONITOR)와 서버를 끌 때(disable — 끌 때는 나가기 사건이 오지 않는다) 가방 41칸·엔더 27칸·각 지문·
- *    월드·MV-Inventories 그룹을 남긴다([SavedInventories.snapshot]).
+ *    월드·가방 칸(모드 — [InvGroups])을 남긴다([SavedInventories.snapshot]).
  * 2. **고치기**: 편집·오프라인 권한이 있으면 `/인벤`·`/엔더` 가 고칠 수 있는 창을 연다 — 내용은 **대기 편집이 있으면 그것, 없으면 나갈 때 모습**.
  *    바뀔 때마다(다음 틱) 대기 편집(DB `ess_inventory_pending` — 고친 내용 · 바탕 모습과 그 지문 · 고친 사람 · 시각)을 바로 쓴다.
  *    한 사람의 가방(또는 엔더)은 한 번에 한 관리자만 고친다(다른 사람은 보기만). 창에서 꺼낸 것은 관리자에게 간다 — 그래서 아래 적용이 믿을 만해야 한다.
- * 3. **적용**: 들어오면(PlayerJoinEvent MONITOR) 먼저 열린 편집 창을 저장하고 닫는다. MV-Inv 가 자기 프로필을 다 얹은 뒤(MV-Inventories 5.3.3 의
- *    `ShareHandleListener` 를 javap 로 확인: 접속 처리 `playerJoin` 은 우선순위 표시가 없어 Multiverse-Core 동적 리스너의 기본값 **NORMAL**, 세계 이동
- *    `playerChangedWorld` 는 `@DefaultEventPriority(LOW)` — 둘 다 Multiverse-Core 의 event-priority 설정(`EventPriorityMapper`)으로 바꿀 수 있다.
- *    프로필은 그 처리 안에서 바로 얹는다. 우리는 MONITOR 에서 DB 에 '적용하려 함' 표를 쓴 뒤 다음 틱 + [InventorySettings.applyDelayTicks])
- *    그 사람의 지금 그룹이 모습의 그룹과 같으면(또는 MV-Inv 가 없으면) 지금 가방을 대기 편집의 바탕과 견준다:
+ * 3. **적용**: 들어오면(PlayerJoinEvent MONITOR) 먼저 열린 편집 창을 저장하고 닫는다. 모드 공급처(inmc-worlds)가 몸을 다 맞춘 뒤(그쪽은 접속·세계 이동
+ *    **LOWEST** 에서 그 자리에서 바꾼다 — 2026-10-15, 전에는 Multiverse-Inventories 가 NORMAL/LOW 에서 바꿨다) 우리는 MONITOR 에서 DB 에 '적용하려 함' 표를
+ *    쓴 뒤 다음 틱 + [InventorySettings.applyDelayTicks] 뒤에, 그 사람의 지금 가방 칸이 모습의 칸과 같으면(또는 모드가 없으면) 지금 가방을 대기 편집의 바탕과 견준다:
  *    - 같다(지문 또는 칸별 비교) → 고친 내용으로 **통째로 덮는다**.
  *    - 이미 고친 내용과 같다 → 이미 적용됨(지우기만).
  *    - 다르다(그새 무엇이 바꿨다) → **칸별 변화로** 얹는다: 관리자가 뺀 것은 아직 있을 때만(같은 종류·개수) 빼고, 넣은 것은 넣고(넘치면 우편),
@@ -373,21 +371,19 @@ class OfflineEdits(private val ess: Ess, private val feature: InventoryFeature) 
 
     @EventHandler(priority = EventPriority.MONITOR)
     fun onWorld(event: PlayerChangedWorldEvent) {
-        // 들어온 월드의 MV 그룹 열쇠를 기억해 둔다 — 서버를 끌 때 MV-Inv 가 먼저 꺼져도 disable() 의 모습에 그룹이 남게([MvInvGroups]).
-        MvInvGroups.of(event.player.world.name)
         if (pending.isEmpty()) return
         schedule(event.player)
     }
 
     /**
-     * 적용할 것이 있으면: DB 에 '적용하려 함' 표를 쓰고(쓰기 스레드) → 끝나면 메인에서 [InventorySettings.applyDelayTicks] 틱 뒤에(MV-Inv 가
-     * 자기 프로필을 다 얹은 뒤) 적용한다. 그사이 나가거나 그룹이 바뀌면 표를 되돌린다.
+     * 적용할 것이 있으면: DB 에 '적용하려 함' 표를 쓰고(쓰기 스레드) → 끝나면 메인에서 [InventorySettings.applyDelayTicks] 틱 뒤에 적용한다.
+     * 그사이 나가거나 가방 칸이 바뀌면(모드를 넘음) 표를 되돌린다.
      */
     private fun schedule(player: Player) {
         val id = player.uniqueId
-        val group = MvInvGroups.of(player.world.name)
+        val group = InvGroups.of(player)
         val due = PendingKind.entries.mapNotNull { pendingFor(id, it) }
-            .filter { key(id, it.kind) !in claiming && MvInvGroups.matches(it.group, group) }
+            .filter { key(id, it.kind) !in claiming && InvGroups.matches(it.group, group) }
         if (due.isEmpty()) return
         val kinds = due.map { it.kind }
         kinds.forEach { claiming += key(id, it) }
@@ -401,7 +397,7 @@ class OfflineEdits(private val ess: Ess, private val feature: InventoryFeature) 
                 now.scheduler.runDelayed(ess.plugin, { _ ->
                     val target = Bukkit.getPlayer(id)
                     for (kind in kinds) {
-                        val out = target?.let { applyNow(it, kind, MvInvGroups.of(it.world.name), persist = true) }
+                        val out = target?.let { applyNow(it, kind, InvGroups.of(it), persist = true) }
                         if (out == null || out.mode == Mode.DEFERRED) release(id, listOf(kind)) else claiming -= key(id, kind)
                     }
                 }, { release(id, kinds) }, delay)
@@ -425,7 +421,7 @@ class OfflineEdits(private val ess: Ess, private val feature: InventoryFeature) 
     internal fun applyNow(player: Player, kind: PendingKind, currentGroup: String?, persist: Boolean): Outcome? {
         val k = key(player.uniqueId, kind)
         val rec = pending[k] ?: return null
-        if (!MvInvGroups.matches(rec.group, currentGroup)) return Outcome(Mode.DEFERRED, emptyList())
+        if (!InvGroups.matches(rec.group, currentGroup)) return Outcome(Mode.DEFERRED, emptyList())
         val current = read(player, kind)
         val base = InvData.decode(rec.base, kind.size)
         val edited = InvData.decode(rec.edited, kind.size)

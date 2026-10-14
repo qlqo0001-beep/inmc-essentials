@@ -1,6 +1,7 @@
 package com.inmc.essentials.spawn
 
 import com.inmc.essentials.Ess
+import kr.inmc.core.integration.Realms
 import org.bukkit.Bukkit
 import org.bukkit.HeightMap
 import org.bukkit.Location
@@ -113,8 +114,20 @@ class SpawnService(private val ess: Ess, private val feature: SpawnFeature) {
     /** 서버 스폰 — 정하지 않았거나 그 월드가 없으면 기본 월드의 스폰. */
     fun target(): Location = config.point?.location() ?: worldSpawn(Bukkit.getWorlds().first())
 
-    /** 첫 스폰 — 따로 정하지 않았으면 서버 스폰. 둘 다 없거나 월드가 없으면 null. */
-    fun firstTarget(): Location? = (config.firstPoint ?: config.point)?.location()
+    /** 이 사람의 스폰 — 모드가 있으면(core `Realms` — inmc-worlds, 2026-10-15) 그 사람 모드의 스폰, 없으면 서버 스폰. */
+    fun target(player: Player): Location = modeSpawn(player.uniqueId) ?: target()
+
+    /** 이 사람 모드의 스폰. 모드가 없으면 null. 아무 스레드(모드는 메모리, 자리는 월드 이름으로 찾는다). */
+    fun modeSpawn(id: UUID): Location? = Realms.of(id)?.let(Realms::spawn)
+
+    /** 같은 모드의 자리인가 — 빌려 쓰는 월드·모드 없음은 같다고 본다. 부활 순서가 다른 모드의 홈·워프로 보내지 않게. */
+    fun sameMode(player: Player, at: Location): Boolean {
+        val mode = at.world?.let(Realms::ofWorld) ?: return true
+        return mode == Realms.of(player)
+    }
+
+    /** 첫 스폰 — 따로 정하지 않았으면 그 사람 모드의 스폰(모드가 있으면), 아니면 서버 스폰. 다 없거나 월드가 없으면 null. */
+    fun firstTarget(id: UUID? = null): Location? = config.firstPoint?.location() ?: id?.let(::modeSpawn) ?: config.point?.location()
 
     /** 월드 스폰 — 블록 가운데. 네더·엔드면 기본 월드의 것. */
     fun worldSpawn(world: World): Location {
@@ -191,10 +204,10 @@ class SpawnService(private val ess: Ess, private val feature: SpawnFeature) {
             when (source) {
                 Source.BED -> bed
                 Source.ANCHOR -> anchor
-                Source.SERVER -> c.point?.location().also { found = it } != null
-                Source.BED_HOME -> homes?.bedHome(player).also { found = it } != null
-                Source.HOME -> homes?.defaultHome(player).also { found = it } != null
-                Source.WARP -> c.respawnWarp.isNotBlank() && warps?.warp(c.respawnWarp).also { found = it } != null
+                Source.SERVER -> (modeSpawn(player.uniqueId) ?: c.point?.location()).also { found = it } != null
+                Source.BED_HOME -> homes?.bedHome(player)?.takeIf { sameMode(player, it) }.also { found = it } != null
+                Source.HOME -> homes?.defaultHome(player)?.takeIf { sameMode(player, it) }.also { found = it } != null
+                Source.WARP -> c.respawnWarp.isNotBlank() && warps?.warp(c.respawnWarp)?.takeIf { sameMode(player, it) }.also { found = it } != null
                 Source.WORLD -> true
             }
         }

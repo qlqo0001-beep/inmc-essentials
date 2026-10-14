@@ -65,7 +65,7 @@
 13. **검증기**: 새 동작마다 `checks()` 에 검사를 더한다. 진짜 사건을 쏘고(`callEvent`), 바꾼 상태는 메모리에서만 바꿨다 `finally` 에서 되돌린다
     (파일·DB 에 쓰지 않는다). 메인 스레드라 DB 를 기다리지 않는다.
 
-14. **선택 플러그인은 리플렉션으로만**(WorldEdit·LuckPerms·Votifier·CoreProtect·TitleForge·Multiverse — `ReflectionPurityTest`). 컴파일 의존은
+14. **선택 플러그인은 리플렉션으로만**(WorldEdit·LuckPerms·Votifier·CoreProtect·TitleForge — `ReflectionPurityTest`. 모드는 core `Realms` — 리플렉션 아님). 컴파일 의존은
     PlaceholderAPI 하나. 남의 메서드를 이름으로 부르면 ARCHITECTURE "리플렉션 진입점" 표에 적는다.
 
 15. **켜기 실패와 기능끼리 엮기.** `enable()` 이 던지면 그 기능만 빠진다 — 그때까지 건 명령·리스너·틱·권한·접점·순위 대상은 플러그인이 거두고

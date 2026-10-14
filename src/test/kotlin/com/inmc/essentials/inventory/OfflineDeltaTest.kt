@@ -87,13 +87,12 @@ class OfflineDeltaTest {
     }
 
     @Test
-    fun `MV 그룹 열쇠 - 이름 순서·대소문자와 무관, 그룹이 없으면 그 월드, 모르면 같다`() {
-        assertEquals("nether,survival", MvInvGroups.key("world", listOf("Survival", "nether")))
-        assertEquals("world:lobby", MvInvGroups.key("lobby", emptyList()))
-        assertTrue(MvInvGroups.matches(null, "survival"))
-        assertTrue(MvInvGroups.matches("survival", null))
-        assertTrue(MvInvGroups.matches("survival", "survival"))
-        assertFalse(MvInvGroups.matches("survival", "creative"))
+    fun `가방 칸 열쇠 - 같아야 같은 가방, 모르면 같다`() {
+        assertTrue(InvGroups.matches(null, "main"))
+        assertTrue(InvGroups.matches("main", null))
+        assertTrue(InvGroups.matches("main", "main"))
+        assertTrue(InvGroups.matches("", ""))
+        assertFalse(InvGroups.matches("main", "build"))
     }
 
     @Test

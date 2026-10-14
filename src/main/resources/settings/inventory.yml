@@ -10,7 +10,7 @@ inv:
   # 끄면 오프라인 보기·고치기를 쓸 수 없습니다.
   snapshot-on-quit: true
   # 오프라인 편집을 들어온 뒤(또는 그 MV 그룹 월드로 옮긴 뒤) 몇 틱 기다렸다가 적용합니다(1~100).
-  # Multiverse-Inventories 가 자기 프로필을 먼저 다 얹게 하는 여유입니다. 그 사이 가방이 바뀌면 칸별로 얹습니다.
+  # 모드 공급처(inmc-worlds)가 몸을 먼저 다 맞추게 하는 여유입니다. 그 사이 가방이 바뀌면 칸별로 얹습니다.
   offline-apply-delay-ticks: 2
 
 # 저장 인벤(/인벤저장 · /인벤불러오기 · /인벤목록 · /인벤삭제). (CMI config.yml inv)

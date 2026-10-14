@@ -179,8 +179,8 @@ CMI 를 대신하는 플러그인의 운영 안내. 기능마다 자세한 것(�
    `%cmi_user_balance_formatted%`→`%inmceco_formatted%`. 스코어보드·TAB·BetterHud 등 **다른 설정의 `%cmi_…%`** 도 찾아 바꾼다(`/플레이스홀더 값 <글>` 로 확인) — 대응: `cmi_user_afk`→`%inmcplayer_…%` 가 아니라 잠수는 PAPI 가 없다(목록 `[잠수]` 표시로), `cmi_user_meta_<키>`→`%inmcmod_meta_<키>%`, `cmi_user_muted`→`%inmcmod_muted%`, `cmi_user_cuffed`→`%inmcmod_cuffed%`, 비행·무적·충돌→`%inmcplayer_flying|canfly|god|collision%`, 채팅 거리→`%inmcchat_range%`.
 6. **LuckPerms** — `minecraft.command.msg`·`minecraft.command.tell`·`minecraft.command.w` 를 `false` 로(바닐라 귓속말이 우리 `/귓` 보다 먼저 잡히지 않게 — chat 기능이 LOWEST 에서 돌리긴 하지만 막아 두는 것이 안전). `cmi.*` 권한 묶음은 `inmcessentials.*` 로 다시 짠다(기본값: 플레이어용은 모두, 관리자용은 op — 위 표).
    첫 접속 킷·권한 보상·`inmcessentials.homes.limit.<n>`·`inmcessentials.warps.warp.<이름>`·`inmcessentials.kits.kit.<이름>`·`inmcessentials.moderation.tempban.max.<초>` 처럼 설정에서 짓는 노드는 선언되지 않으므로 LuckPerms 에서 직접 준다.
-7. **Multiverse** — MV-Core 의 부활·첫 스폰 설정(`firstspawnoverride`·`respawn`)이 우리 spawn(HIGH) 보다 **뒤(MONITOR)에서 덮지 않는지** `/에센셜 검증` 의 "다른 플러그인이 부활 자리를 덮는가" 검사로 본다.
-   Multiverse-Inventories 를 쓰면 `settings/inventory.yml` 의 지연(MV-Inv 의 `playerChangedWorld` 는 LOW, `playerJoin` 은 NORMAL) 을 줄이지 않는다.
+7. **Multiverse → inmc-worlds**(2026-10-15) — Multiverse 3종은 빼고 inmc-worlds 를 쓴다. 모드가 있으면 스폰은 그 사람 모드의 스폰(`/스폰 설정` = 선 곳의 모드 스폰),
+   채팅은 채팅 묶음이 다른 모드끼리 안 보이고, 오프라인 가방 편집은 가방 칸(모드)이 같을 때 얹는다. `/에센셜 검증` 의 "다른 플러그인이 부활 자리를 덮는가" 는 inmc-worlds 를 허용한다.
 8. **inmc-dungeon** — 던전 안 막는 명령 목록은 코드 기본(essentials 이동 명령 전부 — 영타·별칭 포함)에 `config.yml` 의 목록을 **더한다**(옛 config 를 그대로 둬도 된다).
 9. **inmc-menu** — 스폰이 essentials 로 옮겨갔다(`screen: spawn` 버튼은 `player: 스폰` 으로 읽힌다). 메뉴의 `player:` 명령은 "친 것으로" 돌아가므로 `/스폰` 대기(`settings/commands.yml rules`)가 메뉴에서도 먹는다. 스폰 대기를 쓰려면 `rules` 에 `commands: [스폰]` 규칙을 켠다(기본 예제는 꺼져 있음).
 10. **켜고 확인** — `/에센셜 모듈`(19개 ●), `/에센셜 검증`(실패 0 — 검증 중 좌석·투명 더미는 되돌려진다), `/우편`(core `Mail` 공급처 = mail), `/투명`(타이틀포지 이름표·디스코드 목록이 함께 숨는지), `/귓`·`/답장`, `/홈`·`/워프`·`/스폰`, `/킷`(첫 접속 킷은 spawn 이 첫 스폰 뒤에 — spawn 을 끄면 kits 가 접속 때 직접), `/잠수`, `/인벤 <나간 사람>`(대기 편집), `/일정`·`/별칭`, `/밴목록`·`/감옥목록`, `/플레이보상`·`/투표`.

@@ -237,24 +237,12 @@ class InventoryFeature(ess: Ess) : Feature(ess), CmiImportable {
                 }
             }
         },
-        Check("Multiverse-Inventories 그룹 연동(있을 때만)") { _ -> MvInvGroups.probe() },
-        Check("MV 그룹 열쇠 기억 — 지금 월드의 열쇠는 플러그인이 꺼진 뒤에도 남는다(메모리)") { p ->
-            val world = p.world.name
-            val live = MvInvGroups.of(world)
-            val mvInv = Bukkit.getPluginManager().getPlugin("Multiverse-Inventories")?.isEnabled == true
+        Check("가방 칸 열쇠 — 모드가 있으면 core Realms 의 worlds.inventory scope") { p ->
+            val key = InvGroups.of(p)
             when {
-                mvInv && live == null -> "MV-Inv 가 켜져 있는데 ${world} 의 그룹 열쇠가 null 입니다"
-                mvInv && MvInvGroups.lastKnown(world) != live -> "열쇠를 기억하지 않았습니다(${MvInvGroups.lastKnown(world)} ≠ $live)"
-                else -> {
-                    // 기억만으로 답하는 길 — 가짜 월드 이름으로(진짜 기억은 건드리지 않는다).
-                    val fake = "ess-verify-${System.nanoTime()}"
-                    try {
-                        MvInvGroups.remember(fake, "survival")
-                        if (MvInvGroups.lastKnown(fake) != "survival") "기억한 열쇠를 되읽지 못합니다" else null
-                    } finally {
-                        MvInvGroups.forget(fake)
-                    }
-                }
+                !kr.inmc.core.integration.Realms.available -> if (key != null) "모드가 없는데 열쇠가 $key" else null
+                key != kr.inmc.core.integration.Realms.scope(InvGroups.INVENTORY_KEY, p) -> "열쇠 $key 가 Realms 와 다릅니다"
+                else -> null
             }
         },
         Check("조용히 열기 — 복사본 대조(바뀐 칸만 · 같은 것은 같다)") { _ ->
